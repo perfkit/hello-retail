@@ -8,9 +8,9 @@
   },
   "type": "object",
   "properties": {
-    "schema": { "type": "string", "format": "url" },
-    "id":     { "type": "string" },
-    "role":   { "type": "string" }
+    "schema": { "type": "string", "format": "uri" },
+    "id":     { "type": "string", "pattern": "^[\\w-. ]{1,128}$" },
+    "role":   { "type": "string", "pattern": "^photographer|merchant$" }
   },
   "required": [
     "schema",

@@ -8,9 +8,9 @@
   },
   "type": "object",
   "properties": {
-    "schema": { "type": "string" },
-    "id":     { "type": "string" },
-    "name":   { "type": "string" }
+    "schema": { "type": "string", "format": "uri" },
+    "id":     { "type": "string", "pattern": "^[\\w-. ]{1,128}$" },
+    "name":   { "type": "string", "pattern": "^[\\w-. ]{1,128}$" }
   },
   "required": [
     "schema",

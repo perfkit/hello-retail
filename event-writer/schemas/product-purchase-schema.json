@@ -8,8 +8,8 @@
   },
   "type": "object",
   "properties": {
-    "schema":  { "type": "string", "format": "url" },
-    "id": { "type": "string" }
+    "schema": { "type": "string", "format": "uri" },
+    "id":     { "type": "string", "pattern": "^\\d{1,64}$" }
   },
   "required": [
     "schema",

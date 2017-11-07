@@ -8,12 +8,12 @@
   },
   "type": "object",
   "properties": {
-    "schema":  { "type": "string", "format": "url" },
-    "id": { "type": "string" },
-    "brand":  { "type": "string" },
-    "name":  { "type": "string" },
-    "description": { "type": "string" },
-    "category": { "type": "string"}
+    "schema":       { "type": "string", "format": "uri" },
+    "id":           { "type": "string", "pattern": "^\\d{1,64}$" },
+    "brand":        { "type": "string", "pattern": "^.{1,256}$" },
+    "name":         { "type": "string", "pattern": "^.{1,256}$" },
+    "description":  { "type": "string", "pattern": "^.{1,1024}$" },
+    "category":     { "type": "string", "pattern": "^.{1,256}$" }
   },
   "required": [
     "schema",

@@ -9,9 +9,9 @@
   "type": "object",
   "allOf": { "$ref": "retail-stream-schema-ingress.json#" },
   "properties": {
-    "eventId": { "type": "string", "format": "" },
-    "timeIngest":  { "type": "string", "format": "date-time" },
-    "timeProcess": { "type": "string", "format": "date-time" }
+    "eventId":      { "type": "string", "pattern": "^shardId-\\d{12}:\\d{56}$" },
+    "timeIngest":   { "type": "string", "format": "date-time" },
+    "timeProcess":  { "type": "string", "format": "date-time" }
   },
   "required": [
     "eventId",

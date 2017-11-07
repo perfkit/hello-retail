@@ -8,14 +8,14 @@
   },
   "type": "object",
   "properties": {
-    "schema":      { "type": "string", "format": "url" },
-    "followsFrom": { "type": "string" },
-    "origin":      { "type": "string" },
+    "schema":      { "type": "string", "format": "uri" },
+    "followsFrom": { "type": "string", "pattern": "^shardId-\\d{12}:\\d{56}$" },
+    "origin":      { "type": "string", "pattern": "^([\\w-. ]{1,128}\\/){3}[\\w-. ]{1,128}$" },
     "timeOrigin":  { "type": "string", "format": "date-time" },
     "data": {
       "type": "object",
       "properties": {
-        "schema": { "type": "string", "format": "url" }
+        "schema":  { "type": "string", "format": "uri" }
       },
       "required": [
         "schema"
