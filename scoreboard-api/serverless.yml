@@ -1,0 +1,125 @@
+frameworkVersion: '>=1.0.0 <2.0.0'
+
+service: ${self:custom.helloRetail.name}-scoreboard-api
+
+custom:
+  stage: ${opt:stage, self:provider.stage, self:custom.private.stage}
+  private: ${file(../private.yml)}
+  helloRetail: ${file(../helloRetail.yml)}
+  retailStream: ${file(../retail-stream/serverless.yml)}
+  retailStreamVersion: 1
+  scoreboardApiVersion: 1 # The version of this service to depend upon
+  scoreboardApi: ${self:} # externally, use `${file(~/scoreboard-api/serverless.yml)}`, replacing the `~` therein with the appropriate relative reference [e.g. '..' or '../..']
+  # Exports
+  exportScoreboardRestApi: ${self:custom.scoreboardApi.service}:${self:custom.stage}:ScoreboardRestApi:${self:custom.scoreboardApiVersion}
+
+provider:
+  name: aws
+  deploymentBucket: ${self:custom.helloRetail.deploymentBucket}
+  runtime: nodejs4.3
+  profile: ${self:custom.private.profile}
+  region: ${self:custom.private.region}
+  environment:
+    STAGE: ${self:custom.stage}
+
+functions:
+  scoreboardApi:
+    role:
+      Fn::GetAtt: [ ScoreboardApi, Arn ]
+    handler: index.handler
+    environment:
+      STREAM_NAME:
+        Fn::ImportValue: ${self:custom.retailStream.custom.exportRetailStreamName}
+    events:
+      - http:
+          path: scoreboard-api
+          method: post
+          cors:
+            origins:
+              - '*'
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
+
+resources:
+  Resources:
+    # Log Group
+    ScoreboardApiLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: /aws/lambda/${self:service}-${self:custom.stage}-scoreboard-api
+        RetentionInDays: 7
+
+    ProductCategory:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: role
+            AttributeType: S
+          - AttributeName: score
+            AttributeType: I 
+          - AttributeName: updated
+            AttributeType: S
+          - AttributeName: updatedBy
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.stage}-ScoreboardApi-${self:custom.scoreboardApiVersion}
+    ProductCatalog:
+
+    ScoreboardApi: # role for the Event Writer Lambda to write to logs and the Kinesis Stream (retailStream)
+      Type: AWS::IAM::Role
+      Properties:
+        Path: /
+        RoleName: ${self:custom.stage}ScoreboardApi${self:custom.scoreboardApiVersion}
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action: sts:AssumeRole
+              Principal:
+                Service: lambda.amazonaws.com
+        ManagedPolicyArns:
+          - ${self:custom.private.teamPolicy}
+        Policies:
+          - PolicyName: CreateAndWriteToLogStream
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'logs:CreateLogStream'
+                    - 'logs:PutLogEvents'
+                  Resource:
+                    - Fn::Join:
+                      - ':'
+                      - - Fn::GetAtt: [ ScoreboardApiLogGroup, Arn ]
+                        - '*'
+          - PolicyName: WriteToKinesis
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'kinesis:PutRecord'
+                  Resource:
+                    Fn::ImportValue: ${self:custom.retailStream.custom.exportRetailStreamArn}
+
+  Outputs:
+    ScoreboardRestApi:
+      Description: API used to submit producer events to the Kinesis Stream
+      Value:
+        Ref: ApiGatewayRestApi
+      Export:
+        Name: ${self:custom.scoreboardApi.custom.exportScoreboardRestApi}
