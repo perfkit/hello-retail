@@ -1,0 +1,22 @@
+root: true
+extends: airbnb
+rules:
+  "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }]
+  max-len: off
+  no-console: off
+  no-else-return: off
+  no-plusplus:
+    - error
+    - allowForLoopAfterthoughts: true
+  no-unexpected-multiline: error
+  semi:
+    - error
+    - never
+plugins:
+  - import
+env:
+  es6: true
+  node: true
+  browser: true
+  mocha: true
+

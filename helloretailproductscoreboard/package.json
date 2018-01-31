@@ -17,6 +17,20 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "unit": "mkdir build || true && ./node_modules/.bin/babel ./**/*.js ./src/**/*.jsx --out-dir build && ./node_modules/.bin/mocha --recursive ./build/**/*.spec.js",
+    "eject": "react-scripts eject",
+    "lint": "./node_modules/.bin/eslint --quiet **/*.js **/*.jsx || true"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babelify": "^8.0.0",
+    "browserify": "^15.2.0",
+    "eslint": "^4.16.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.6.1",
+    "mocha": "^5.0.0"
   }
 }

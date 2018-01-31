@@ -1,66 +1,53 @@
-import React, { Component } from "react";
-var randomID = require("random-id");
+import React, { Component } from 'react'
+
+
+const defaultProps = {
+  transactions: [],
+  onDelete: () => null,
+  onEdit: () => null,
+}
+
+export const sortById = transactions => []
+  .concat(transactions)
+  .sort((a, b) => b.lastEventId - a.lastEventId)
+
+const render2 = ({ transactions }) => (
+
+  <table width="100%">
+    <thead>
+      <tr>
+        <th>user</th>
+        <th>role</th>
+        <th>score</th>
+      </tr>
+    </thead>
+    <tbody>
+      {sortById(transactions).map(this.renderOrEditPost)}
+    </tbody>
+  </table>
+)
 
 export default class AllTransactions extends Component {
+  static renderOrEditPost(transaction) {
+    return ({ transaction })
+  }
 
-    constructor(props) {
-        super(props);
+  constructor(props) {
+    super(props || defaultProps)
+  }
 
-        this.state = {
-            editing: {}
-        }
+  componentWillMount() {
+    this.props.subscribeToNewTransactions({
+      transactions: this.props.transactions,
+    })
+
+    AllTransactions.propTypes = {
+      transactions: React.propTypes.string.isRequired,
+      subscribeToNewTransactions: React.propTypes.string.isRequired,
     }
+  }
 
-    componentWillMount(){
-        this.props.subscribeToNewTransactions({
-            transactions: this.props.transactions
-        });
-    }
-
-    static defaultProps = {
-        transactions: [],
-        onDelete: () => null,
-        onEdit: () => null,
-    }
-
-
-    renderOrEditPost = (transaction) => {
-        const {editing} = this.state;
-        var isCreator = false 
-
-
-        return ( 
-
-
-            <tr key={Math.random()}> //change back to product id when done
-                <td>{
-                    transaction.productId
-                }</td>
-                <td>{transaction.role}</td>
-                <td>{transaction.score}</td>
-            </tr>
-        );
-    }
-
-    render() {
-        const {transactions} = this.props;
-        console.log("THIS BE THE PROPS", this.props)
-
-        return (
-
-            <table width="100%">
-                <thead>
-                    <tr>
-                        <th>user</th>
-                        <th>role</th>
-                        <th>score</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    { [].concat(transactions).sort((a, b) => b.lastEventId - a.lastEventId).map(this.renderOrEditPost) }
-                
-                </tbody>
-            </table>
-        );
-    }
+  render() {
+    return render2(this.props)
+  }
 }
