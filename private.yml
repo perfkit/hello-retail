@@ -1,0 +1,46 @@
+accountId: 515126931066
+stage: ci
+proxyServer: http://webproxysea.nordstrom.net:8181
+profile: 'nordstrom-federated'
+region: 'us-west-2'
+company: nordstrom
+team: jetpack
+teamRole: 'NORD-NonProd_Jetpack-DevUsers-Team'
+teamPolicy: 'arn:aws:iam::515126931066:policy/appteam/fff000-iam-jetpack-team01-TeamManagedPolicy-14HDHEC4ECX8V'
+# system config
+behaviors:
+  assignmentsPerRegistration:
+    default: 3
+    demo: 1
+    austin: 1
+# product-photos
+twilio:
+  accountSid: AQECAHjK5V63OBFtX8zieaGQIuF9hmiF79vHNVShcxIvAiFgiQAAAIAwfgYJKoZIhvcNAQcGoHEwbwIBADBqBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDBM+kNzLvi0EmhsYXgIBEIA9SiU1vdsmfcyzOH9xiSkBAe1JJLXGyixOFyMtF2/u3Uu5HXEmek881NiQBNXfglymrdoJlbPhs1aJzEpwUw==
+  authToken: AQECAHjK5V63OBFtX8zieaGQIuF9hmiF79vHNVShcxIvAiFgiQAAAH4wfAYJKoZIhvcNAQcGoG8wbQIBADBoBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDD37uVF5gkXs27//EAIBEIA7TEyrMreVFbMrhzmlscVKuO68PeJj5jIy3QaDRVj0EARaXxSGcyQKI/tfmaVRKq3x3XrFR0ai/+Nj2NE=
+  number: +12064832943
+  prod:
+    number: +12062021893
+  ci:
+    number: +15005550006 # reserved for ci/testing (this number doesn't do anything in the real world)
+  test:
+    number: +12062021849
+  demo:
+    number: +12064832943 # duplicate of above "stage"less `number`
+  erik:
+    number: +12062021223
+  greg:
+    number: +12062021267
+  bimx:
+    number: +12062021906
+  ashmib:
+    number: +12062020273
+  workshop041917:
+    number: +12062020351
+  austin:
+    number: +12062022118
+# web
+domainName: hello-retail.biz
+websiteSSLCert: arn:aws:acm:us-east-1:515126931066:certificate/9b3e4853-ab33-44ac-8892-f2236970614c
+# Login with Amazon
+loginWithAmazonClientId: amzn1.application-oa2-client.d38cc5e49f9343b5b7a718f9d21fc93a
+loginWithAmazonAppId: amzn1.application.0bfd7ce688a440a1ad215923053e1ec6
