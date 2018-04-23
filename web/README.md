@@ -19,7 +19,7 @@ providing the stage to use:
 
 ```bash
 npm install
-npm run web:build:<stage>
+npm run web:build <stage>
 ```
 
 for example, `npm run web:build:prod` to build the web application stack for the production environment.
@@ -79,7 +79,7 @@ for individual applications.
 To deploy the application to a specific stage, use the following _npm_ command:
 
 ```bash
-npm run web:deploy:<stage>
+npm run web:deploy <stage>
 ```
 
 for example, `npm run web:deploy:demo` will deploy the currently built application to the *demo* stage
