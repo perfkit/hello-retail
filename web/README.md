@@ -22,7 +22,7 @@ npm install
 npm run web:build <stage>
 ```
 
-for example, `npm run web:build:prod` to build the web application stack for the production environment.
+for example, `npm run web:build prod` to build the web application stack for the production environment.
 
 The build is performed in two steps:
 
@@ -40,12 +40,6 @@ To run the application locally for development or testing, run the following _np
 
 ```bash
 npm run web:dev:hot
-```
-
-Alternatively if this doesn't work, you can try:
-
-```bash
-python -m SimpleHTTPServer 7700
 ```
 
 Open [http://localhost:7700](http://localhost:7700) in your browser.
@@ -82,7 +76,7 @@ To deploy the application to a specific stage, use the following _npm_ command:
 npm run web:deploy <stage>
 ```
 
-for example, `npm run web:deploy:demo` will deploy the currently built application to the *demo* stage
+for example, `npm run web:deploy demo` will deploy the currently built application to the *demo* stage
 hosted in AWS.
 
 This deployment uses the Serverless framework's `deploy` command to provision the necessary AWS
