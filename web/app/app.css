@@ -64,6 +64,14 @@ label {
   text-decoration: none !important;
 }
 
+.cartLink {
+  position: absolute;
+  left: 3em;
+  top: 1em;
+  font-size: 120%;
+  text-decoration: none !important;
+}
+
 
 button:not(.awsLoginButton) {
   color: black;
