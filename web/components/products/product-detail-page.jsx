@@ -25,8 +25,10 @@ class ProductDetailPage extends Component {
     this.state = {}
     this.productsLoaded = this.productsLoaded.bind(this)
     this.purchaseProduct = this.purchaseProduct.bind(this)
+    this.addToCart = this.addToCart.bind(this)
     this.state.errors = []
     this.state.buyMessage = null
+    this.state.addMessage = null
   }
 
   productsLoaded(products) {
@@ -65,15 +67,45 @@ class ProductDetailPage extends Component {
     })
   }
 
+  addToCart() {
+    this.props.awsLogin.makeApiRequest(config.EventWriterApi, 'POST', '/event-writer/', {
+      schema: 'com.nordstrom/product/cart/1-0-0',
+      id: this.props.params.id,
+      origin: `hello-retail/web-client-purchase-product/${this.props.awsLogin.state.profile.id}/${this.props.awsLogin.state.profile.name}`,
+    })
+      .then(() => {
+        this.setState({
+          addMessage: 'Added to Cart.',
+        })
+      })
+      .catch((error) => {
+        console.log(error)
+        this.setState({
+          errors: [error],
+        })
+      })
+
+    this.setState({
+      addMessage: 'Adding to Cart ...',
+    })
+  }
+
   render() {
     // TODO: Add query for single product by id
     // TODO: Add image
 
-    let blurb = null
-    if (!this.state.buyMessage) {
-      blurb = <button onClick={this.purchaseProduct}>Buy</button>
+    // let blurb = null
+    // if (!this.state.buyMessage) {
+    //   blurb = <button onClick={this.purchaseProduct}>Buy</button>
+    // } else {
+    //   blurb = <h4>{this.state.buyMessage}</h4>
+    // }
+
+    let cartBlurb = null
+    if (!this.state.addMessage) {
+      cartBlurb = <button onClick={this.addToCart}>Add to Cart</button>
     } else {
-      blurb = <h4>{this.state.buyMessage}</h4>
+      cartBlurb = <h4>{this.state.addMessage}</h4>
     }
 
     const backButtonStyle = {
@@ -91,7 +123,7 @@ class ProductDetailPage extends Component {
           </div>
           <br />
           <ValidationErrors errors={this.state.errors} />
-          {blurb}
+          {cartBlurb}
           <ProductDataSource awsLogin={this.props.awsLogin} productId={this.props.params.id} productsLoaded={this.productsLoaded} />
           <button style={backButtonStyle} onClick={browserHistory.goBack}>Back to List</button>
         </div>
