@@ -1,6 +1,4 @@
 import React, { Component, PropTypes } from 'react'
-import ValidationErrors from '../validation-errors'
-import config from '../../config'
 
 class CartPage extends Component {
   // TODO: DRY up all these duplicate propType declarations everywhere
@@ -27,8 +25,8 @@ class CartPage extends Component {
 
   render() {
     return (
-      <div> // TODO: Change this section
-      <h1> Shopping Cart </h1>
+      <div>
+        <h1> Shopping Cart </h1>
       </div>
     )
   }
