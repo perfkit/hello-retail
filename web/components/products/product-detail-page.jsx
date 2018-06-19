@@ -101,11 +101,11 @@ class ProductDetailPage extends Component {
     //   blurb = <h4>{this.state.buyMessage}</h4>
     // }
 
-    let cartblurb = null
+    let cartBlurb = null
     if (!this.state.addMessage) {
-      cartblurb = <button onClick={this.addToCart}>Add to Cart</button>
+      cartBlurb = <button onClick={this.addToCart}>Add to Cart</button>
     } else {
-      cartblurb = <h4>{this.state.addMessage}</h4>
+      cartBlurb = <h4>{this.state.addMessage}</h4>
     }
 
     const backButtonStyle = {
@@ -123,7 +123,7 @@ class ProductDetailPage extends Component {
           </div>
           <br />
           <ValidationErrors errors={this.state.errors} />
-          {cartblurb}
+          {cartBlurb}
           <ProductDataSource awsLogin={this.props.awsLogin} productId={this.props.params.id} productsLoaded={this.productsLoaded} />
           <button style={backButtonStyle} onClick={browserHistory.goBack}>Back to List</button>
         </div>
