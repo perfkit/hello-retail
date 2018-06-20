@@ -10,7 +10,6 @@ custom:
   retailStream: ${file(../../retail-stream/serverless.yml)}
   cartBuilder: ${self:}
   # Exports
-  # TODO check if these next 2 lines are necessary for cart
   exportCartTableName: ${self:custom.cartBuilder.service}:${self:custom.stage}:CartTableName
   exportCartTableArn: ${self:custom.cartBuilder.service}:${self:custom.stage}:CartTableArn
 
@@ -22,10 +21,10 @@ provider:
   region: ${self:custom.private.region}
 
 functions:
-  catalog:
+  cart:
     role:
       Fn::GetAtt: [ CartBuilder, Arn ]
-    handler: catalog.processKinesisEvent
+    handler: cart.processKinesisEvent
     environment:
       TABLE_CART_NAME:
         Ref: Cart
@@ -48,11 +47,11 @@ resources:
     Cart:
       Type: AWS::DynamoDB::Table
       Properties:
-        AttributeDefinitions: # TODO check these once I have cart schema
-          - AttributeName: id
+        AttributeDefinitions:
+          - AttributeName: userId
             AttributeType: S
-        KeySchema: # TODO check these once I have cart schema
-          - AttributeName: id
+        KeySchema:
+          - AttributeName: userId
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
