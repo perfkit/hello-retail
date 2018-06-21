@@ -30,8 +30,7 @@ functions:
         Ref: Cart
     events:
       - stream:
-          arn: 'arn:aws:kinesis:${self:provider.region}:${self:custom.private.accountId}:stream/${self:custom.stage}RetailStream' # replace this with the below, once supported by Serverless
-#            Fn::ImportValue: ${self:custom.retailStream.custom.exportRetailStreamArn}
+          arn: 'arn:aws:kinesis:${self:provider.region}:${self:custom.private.accountId}:stream/${self:custom.stage}RetailStream'
           enabled: true
           startingPosition: TRIM_HORIZON
 

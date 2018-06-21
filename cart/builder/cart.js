@@ -43,7 +43,6 @@ const impl = {
           priorErr = err
         } else {
           priorErr = false
-          console.log("no err")
         }
       } else if (priorErr && err) { // second update result, if an error was previously received and we have a new one
         complete(`${constants.METHOD_PUT_CART} - errors updating DynamoDb: ${[priorErr, err]}`)
@@ -78,12 +77,10 @@ const impl = {
     }
     console.log(dbParamsCart)
     dynamo.update(dbParamsCart, updateCallback)
-    console.log("dynamo.update finished")
   },
 }
 
 kh.registerSchemaMethodPair(productCartSchema, impl.putCart)
-console.log('kh happened')
 
 module.exports = {
   processKinesisEvent: kh.processKinesisEvent.bind(kh),
