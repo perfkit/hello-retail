@@ -26,7 +26,6 @@ const impl = {
    * {
    *   "schema": "com.nordstrom/retail-stream/1-0-0",
    *   "origin": "hello-retail/product-producer-automation",
-   *   "timeOrigin": "2017-01-12T18:29:25.171Z",
    *   "data": {
    *     "schema": "com.nordstrom/product/cart/1-0-0",
    *     "id": "4579874"
@@ -36,14 +35,15 @@ const impl = {
    * @param complete The callback to inform of completion, with optional error parameter.
    */
   putCart: (event, complete) => {
-    const updated = Date.now()
     let priorErr
     const updateCallback = (err) => {
       if (priorErr === undefined) { // first update result
         if (err) {
+          console.log("err = ", err)
           priorErr = err
         } else {
           priorErr = false
+          console.log("no err")
         }
       } else if (priorErr && err) { // second update result, if an error was previously received and we have a new one
         complete(`${constants.METHOD_PUT_CART} - errors updating DynamoDb: ${[priorErr, err]}`)
@@ -57,32 +57,33 @@ const impl = {
       TableName: constants.TABLE_CART_NAME,
       Key: {
           userId: event.origin,
+          productId: event.data.id,
       },
       UpdateExpression: [
         'set',
         '#c=if_not_exists(#c,:c),',
-        '#cb=if_not_exists(#cb,:cb),',
-        '#id=:id',
+        '#cb=if_not_exists(#cb,:cb)',
       ].join(' '),
       ExpressionAttributeNames: {
         '#c': 'created',
         '#cb': 'createdBy',
-        '#id': 'productId',
       },
       ExpressionAttributeValues: {
-        ':c': updated,
+        ':c': Date.now(),
         ':cb': event.origin,
-        ':id': event.data.id,
       },
       ReturnValues: 'NONE',
       ReturnConsumedCapacity: 'NONE',
       ReturnItemCollectionMetrics: 'NONE',
     }
+    console.log(dbParamsCart)
     dynamo.update(dbParamsCart, updateCallback)
+    console.log("dynamo.update finished")
   },
 }
 
 kh.registerSchemaMethodPair(productCartSchema, impl.putCart)
+console.log('kh happened')
 
 module.exports = {
   processKinesisEvent: kh.processKinesisEvent.bind(kh),
