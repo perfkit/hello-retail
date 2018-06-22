@@ -28,7 +28,7 @@ const impl = {
    *     "schema": "com.nordstrom/product/cart/1-0-0",
    *     "id": "4579874"
    *   }
-   *   "origin": "hello-retail/product-producer-automation",
+   *   "origin": "hello-retail/cart-automation",
    * }
    * @param event The product to put in the cart.
    * @param complete The callback to inform of completion, with optional error parameter.
