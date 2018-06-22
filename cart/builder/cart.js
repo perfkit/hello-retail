@@ -3,8 +3,6 @@
 const aws = require('aws-sdk') // eslint-disable-line import/no-unresolved, import/no-extraneous-dependencies
 const KH = require('kinesis-handler')
 
-//adding comment
-
 const eventSchema = require('./retail-stream-schema-ingress.json')
 const productCartSchema = require('./product-cart-schema.json')
 
