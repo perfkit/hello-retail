@@ -20,16 +20,15 @@ const kh = new KH.KinesisHandler(eventSchema, constants.MODULE)
 const dynamo = new aws.DynamoDB.DocumentClient()
 
 const impl = {
-  // TODO update the below comment to reflect cart schema
   /**
    * Put the carted product in to the dynamo cart database.  Example event:
    * {
    *   "schema": "com.nordstrom/retail-stream/1-0-0",
-   *   "origin": "hello-retail/product-producer-automation",
    *   "data": {
    *     "schema": "com.nordstrom/product/cart/1-0-0",
    *     "id": "4579874"
    *   }
+   *   "origin": "hello-retail/product-producer-automation",
    * }
    * @param event The product to put in the cart.
    * @param complete The callback to inform of completion, with optional error parameter.
