@@ -10,6 +10,7 @@ import PhotographerRegisterPage from './photographer/photographer-register-page'
 import ProductCategoryPage from './products/product-by-category-page'
 import ProductDetailPage from './products/product-detail-page'
 import RoleSelectionPage from './roles/role-selection-page'
+import CartPage from './cart/cart-page'
 
 ReactDOM.render(
   (<Router history={hashHistory}>
@@ -20,6 +21,7 @@ ReactDOM.render(
       <Route path="photographer" component={PhotographerRegisterPage} />
       <Route path="category/:category" component={ProductCategoryPage} />
       <Route path="product/:id" component={ProductDetailPage} />
+      <Route path="cart" component={CartPage} />
     </Route>
   </Router>),
   document.getElementById('root'),
