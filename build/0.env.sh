@@ -1,6 +1,6 @@
 #!/bin/sh
 
-MSG="You must set the COMPANY, TEAM, REGION, STAGE environment variables"
+MSG="You must set the COMPANY, TEAM, STAGE environment variables"
 
 fail=0
 failMsg=""
@@ -17,7 +17,6 @@ check()
 
 check COMPANY
 check TEAM
-check REGION
 check STAGE
 
 if [ $fail -ne 0 ]; then
