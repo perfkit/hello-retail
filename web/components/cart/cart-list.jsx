@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react'
 import CartItem from './cart-item'
-import CartDataSource from './cart-data-source'
 
 class CartList extends Component {
   static propTypes = {
@@ -17,7 +16,7 @@ class CartList extends Component {
   }
 
   render() {
-    console.log("CartList")
+    console.log('CartList')
     console.log(this.props)
     console.log(this.props.cartList)
     if (!this.props.cartList) {
@@ -28,7 +27,7 @@ class CartList extends Component {
       <div>
         {
           this.props.cartList.map(cart => (
-            <CartItem className="cartItem" cartItemName={cart.name} key={cart.name}/>
+            <CartItem className="cartItem" cartItemName={cart.name} key={cart.name} />
           ))
         }
       </div>

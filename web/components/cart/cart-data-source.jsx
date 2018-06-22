@@ -23,17 +23,6 @@ class CartDataSource extends Component {
     this.componentDidMount = this.componentDidMount.bind(this)
   }
 
-  productsLoaded(products) {
-    const p = products[0]
-    this.setState({
-      name: p.name,
-      brand: p.brand,
-      description: p.description,
-      id: p.id,
-      image: p.image ? `https://${p.image}` : null,
-    })
-  }
-
   componentDidMount() {
     this.dynamo = new this.props.awsLogin.aws.DynamoDB()
 
@@ -97,6 +86,16 @@ class CartDataSource extends Component {
       })
   }
 
+  productsLoaded(products) {
+    const p = products[0]
+    this.setState({
+      name: p.name,
+      brand: p.brand,
+      description: p.description,
+      id: p.id,
+      image: p.image ? `https://${p.image}` : null,
+    })
+  }
   render() {
     return null
   }

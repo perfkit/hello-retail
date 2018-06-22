@@ -30,7 +30,7 @@ class CartPage extends Component {
   cartItemsLoaded(cartItems) {
     this.setState({
       cartItemsList: cartItems.sort((l, r) => l.name.localeCompare(r.name)),
-      cartIDList: "hi",
+      cartIDList: 'hi',
     })
   }
 
@@ -46,15 +46,15 @@ class CartPage extends Component {
   }
 
   render() {
-    console.log("HELLO!!!")
+    console.log('HELLO!!!')
     console.log(this)
     console.log(this.state)
     return (
       <div>
         <h3><em>Shopping Cart</em></h3>
-        <CartList className="cartList" cartList={this.state.cartItemsList} cookie = "hi"/>
+        <CartList className="cartList" cartList={this.state.cartItemsList} cookie="hi" />
         {/* <CartList className="cartIDList" cartList */}
-        <CartDataSource awsLogin={this.props.awsLogin} cartItemsLoaded={this.cartItemsLoaded} productsLoaded={this.productsLoaded}/>
+        <CartDataSource awsLogin={this.props.awsLogin} cartItemsLoaded={this.cartItemsLoaded} productsLoaded={this.productsLoaded} />
       </div>
     )
   }
