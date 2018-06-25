@@ -51,7 +51,6 @@ const impl = {
         complete()
       }
     }
-    // const userIdToSlice = event.origin
     const dbParamsCart = {
       TableName: constants.TABLE_CART_NAME,
       Key: {
