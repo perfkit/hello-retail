@@ -51,24 +51,32 @@ const impl = {
         complete()
       }
     }
+    // const userIdToSlice = event.origin
     const dbParamsCart = {
       TableName: constants.TABLE_CART_NAME,
       Key: {
-          userId: event.origin,
+          userId: event.origin.slice(event.origin.lastIndexOf(".")+1, event.origin.lastIndexOf("/")),
           productId: event.data.id,
       },
       UpdateExpression: [
-        'set',
+        'SET',
         '#c=if_not_exists(#c,:c),',
-        '#cb=if_not_exists(#cb,:cb)',
+        '#u=:u,',
+        '#fn=:fn',
+        'ADD',
+        '#q :q',
       ].join(' '),
       ExpressionAttributeNames: {
-        '#c': 'created',
-        '#cb': 'createdBy',
+        '#c': 'createdAt',
+        '#u': 'updatedAt',
+        '#fn': 'friendlyName',
+        '#q': 'quantity',
       },
       ExpressionAttributeValues: {
         ':c': Date.now(),
-        ':cb': event.origin,
+        ':u': Date.now(),
+        ':fn': event.origin.slice(event.origin.lastIndexOf("/")+1),
+        ':q': 1,
       },
       ReturnValues: 'NONE',
       ReturnConsumedCapacity: 'NONE',
