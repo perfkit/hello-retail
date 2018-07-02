@@ -9,93 +9,72 @@ class CartDataSource extends Component {
       }),
     }),
     cartItemsLoaded: PropTypes.func.isRequired,
+    userId: PropTypes.string,
   }
 
   static defaultProps = {
     awsLogin: null,
+    userId: null,
   }
 
   constructor(props) {
     super(props)
-    this.getCartItemsAsync = this.getCartItemsAsync.bind(this)
-    this.getCartItemsFromDynamoAsync = this.getCartItemsFromDynamoAsync.bind(this)
-    this.productsLoaded = this.productsLoaded.bind(this)
+    // this.getCartItemsAsync = this.getCartItemsAsync.bind(this)
+    // this.getCartItemsFromDynamoAsync = this.getCartItemsFromDynamoAsync.bind(this)
+    this.getCartProductsByUserIdAsync = this.getCartProductsByUserIdAsync.bind(this)
+    this.getCartProductsByUserIdFromDynamoAsync = this.getCartProductsByUserIdFromDynamoAsync.bind(this)
+    // this.productsLoaded = this.productsLoaded.bind(this)
+    // this.cartItemsLoaded = this.cartItemsLoaded.bind(this)
     this.componentDidMount = this.componentDidMount.bind(this)
+    console.log('cart-data-source props:')
+    console.log(this.props)
   }
 
   componentDidMount() {
     this.dynamo = new this.props.awsLogin.aws.DynamoDB()
+    this.docClient = new this.props.awsLogin.aws.DynamoDB.DocumentClient()
 
-    this.getCartItemsAsync()
-      .then(this.props.cartItemsLoaded)
-  }
-
-  getCartItemsFromDynamoAsync() {
-    const params = {
-      TableName: config.ProductCatalogTableName,
-      AttributesToGet: ['name'],
+    if (this.props.userId) {
+      return this.getCartProductsByUserIdAsync(this.props.userId)
+        .then(this.props.cartItemsLoaded)
+        // .then(this.props.productsLoaded)
+    } else {
+      return Promise.reject(new Error('userId required'))
     }
-    return this.dynamo.scan(params).promise()
   }
 
-  getCartItemsAsync() {
-    return this.getCartItemsFromDynamoAsync()
-      .then((data) => { // report successful results
-        const cartItemsList = []
-        data.Items.forEach((item) => {
-          cartItemsList.push({
-            name: item.name.S,
-          })
-        })
-        return cartItemsList
-      })
-  }
-
-  getProductsByCategoryFromDynamoAsync(category) {
+  getCartProductsByUserIdFromDynamoAsync(userId) {
     const params = {
-      ProjectionExpression: '#br, #de, #na, id',
-      TableName: config.ProductCatalogTableName,
-      IndexName: 'Category',
-      KeyConditionExpression: '#ct = :ct',
+      TableName: config.CartTableName,
+      KeyConditionExpression: '#ui = :ui',
       ExpressionAttributeNames: {
-        '#br': 'brand',
-        '#de': 'description',
-        '#na': 'name',
-        '#ct': 'category',
+        '#ui': 'userId',
       },
       ExpressionAttributeValues: {
-        ':ct': { S: category },
+        ':ui': userId,
       },
     }
-    return this.dynamo.query(params).promise()
+    return this.docClient.query(params).promise()
   }
 
-  getProductsByCategoryAsync(category) {
-    return this.getProductsByCategoryFromDynamoAsync(category)
-      .then((data) => {
-        const productList = []
-        data.Items.forEach((item) => {
-          productList.push({
-            brand: item.brand.S,
-            description: item.description.S,
-            name: item.name.S,
-            id: item.id.S,
-          })
+  getCartProductsByUserIdAsync(userId) {
+    return this.getCartProductsByUserIdFromDynamoAsync(userId)
+    .then((data) => {
+      const cartProductList = []
+      data.Items.forEach((item) => {
+        cartProductList.push({
+          productId: item.productId,
+          createdAt: item.createdAt,
+          quantity: item.quantity,
+          updatedAt: item.updatedAt,
+          friendlyName: item.friendlyName,
+          userId: item.userId,
         })
-        return productList
       })
-  }
-
-  productsLoaded(products) {
-    const p = products[0]
-    this.setState({
-      name: p.name,
-      brand: p.brand,
-      description: p.description,
-      id: p.id,
-      image: p.image ? `https://${p.image}` : null,
+      return cartProductList
     })
   }
+
   render() {
     return null
   }

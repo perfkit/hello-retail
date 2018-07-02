@@ -13,6 +13,7 @@ class CartList extends Component {
   constructor(props) {
     super(props)
     this.state = {}
+    console.log(this.props)
   }
 
   render() {
@@ -27,7 +28,14 @@ class CartList extends Component {
       <div>
         {
           this.props.cartList.map(cart => (
-            <CartItem className="cartItem" cartItemName={cart.name} key={cart.name} />
+            <CartItem
+              className="cartItem"
+              productId={cart.productId}
+              createdAt={cart.createdAt}
+              updatedAt={cart.updatedAt}
+              userId={cart.userId}
+              key={cart.createdAt}
+            />
           ))
         }
       </div>

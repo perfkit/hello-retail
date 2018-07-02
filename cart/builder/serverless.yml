@@ -122,6 +122,18 @@ resources:
                       - '/'
                       - - 'arn:aws:dynamodb:${self:provider.region}:${self:custom.private.accountId}:table'
                         - Ref: Cart
+          # - PolicyName: ReadFromCart
+          #   PolicyDocument:
+          #     Version: '2012-10-17'
+          #     Statement:
+          #       -  Effect: Allow
+          #          Action:
+          #            - 'dynamodb:Scan'
+          #            - 'dynamodb:GetItem'
+          #            - 'dynamodb:BatchGetItem'
+          #            - 'dynamodb:Query'
+          #          Resource:
+          #           Fn::ImportValue: ${self:custom.cartBuilder.custom.exportCartTableArn}
 
   Outputs:
     CartTableName:

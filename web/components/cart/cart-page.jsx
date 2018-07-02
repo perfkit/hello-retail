@@ -23,38 +23,28 @@ class CartPage extends Component {
   constructor(props) {
     super(props)
     this.state = {}
+    console.log(this.props)
     this.cartItemsLoaded = this.cartItemsLoaded.bind(this)
-    this.productsLoaded = this.productsLoaded.bind(this)
   }
 
   cartItemsLoaded(cartItems) {
     this.setState({
-      cartItemsList: cartItems.sort((l, r) => l.name.localeCompare(r.name)),
-      cartIDList: 'hi',
+      cartItemsList: cartItems,
     })
   }
 
-  productsLoaded(products) {
-    const p = products[0]
-    this.setState({
-      name: p.name,
-      brand: p.brand,
-      description: p.description,
-      id: p.id,
-      image: p.image ? `https://${p.image}` : null,
-    })
-  }
+  // productsLoaded(products) {
+  //   this.setState({
+  //     productItemsList: productItems,
+  //   })
+  // }
 
   render() {
-    console.log('HELLO!!!')
-    console.log(this)
-    console.log(this.state)
     return (
       <div>
         <h3><em>Shopping Cart</em></h3>
-        <CartList className="cartList" cartList={this.state.cartItemsList} cookie="hi" />
-        {/* <CartList className="cartIDList" cartList */}
-        <CartDataSource awsLogin={this.props.awsLogin} cartItemsLoaded={this.cartItemsLoaded} productsLoaded={this.productsLoaded} />
+        <CartList className="cartList" userId={this.props.awsLogin.state.profile.id.slice(14)} cartList={this.state.cartItemsList} />
+        <CartDataSource awsLogin={this.props.awsLogin} userId={this.props.awsLogin.state.profile.id.slice(14)} cartItemsLoaded={this.cartItemsLoaded} />
       </div>
     )
   }

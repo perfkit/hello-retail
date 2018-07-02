@@ -3,12 +3,11 @@ import { Link } from 'react-router'
 
 class CartItem extends Component {
   static propTypes = {
-    cartItemName: PropTypes.string.isRequired,
+    productId: PropTypes.string.isRequired,
+    // createdAt: PropTypes.number.isRequired,
+    // updatedAt: PropTypes.number.isRequired,
+    // userId: PropTypes.string.isRequired,
   };
-
-  static defaultProps = {
-    id: 0,
-  }
 
   constructor(props) {
     super(props)
@@ -17,14 +16,13 @@ class CartItem extends Component {
 
   // TODO: Replace 'id' with this.props.id
   render() {
-    console.log(this.props)
     return (
       <div>
         <Link
           className="cartItemLink"
-          to={`/product/${encodeURIComponent('id')}`}
+          to={`/product/${encodeURIComponent(this.props.productId)}`}
         >
-          {this.props.cartItemName}
+          {this.props.productId}
         </Link>
       </div>
     )
