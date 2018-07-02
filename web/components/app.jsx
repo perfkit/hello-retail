@@ -39,7 +39,7 @@ class App extends Component {
         <Link className="cartLink glyphicon glyphicon-shopping-cart" to={'/cart'} />
         <div className="app text-center container" >
           <h1>{config.WebAppName}</h1>
-          { this.state.loggedIn ? (<h4>Welcome <em>{app.state.awsLogin.state.profile.name}</em></h4>) : null }
+          { this.state.loggedIn ? (<h4>Welcome, <em>{app.state.awsLogin.state.profile.name}</em></h4>) : null }
           <hr />
           <div className="content">
             {children}

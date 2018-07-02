@@ -3,11 +3,19 @@ import CartItem from './cart-item'
 
 class CartList extends Component {
   static propTypes = {
+    awsLogin: PropTypes.shape({
+      aws: PropTypes.shape({
+        DynamoDB: PropTypes.shape({
+          DocumentClient: PropTypes.func,
+        }),
+      }),
+    }),
     cartList: PropTypes.arrayOf(React.PropTypes.object),
   }
 
   static defaultProps = {
     cartList: [],
+    awsLogin: null,
   }
 
   constructor(props) {
@@ -17,9 +25,6 @@ class CartList extends Component {
   }
 
   render() {
-    console.log('CartList')
-    console.log(this.props)
-    console.log(this.props.cartList)
     if (!this.props.cartList) {
       return null
     }
@@ -33,8 +38,9 @@ class CartList extends Component {
               productId={cart.productId}
               createdAt={cart.createdAt}
               updatedAt={cart.updatedAt}
-              userId={cart.userId}
+              quantity={cart.quantity}
               key={cart.createdAt}
+              awsLogin={this.props.awsLogin}
             />
           ))
         }

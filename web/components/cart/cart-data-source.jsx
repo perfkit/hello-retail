@@ -5,7 +5,9 @@ class CartDataSource extends Component {
   static propTypes = {
     awsLogin: PropTypes.shape({
       aws: PropTypes.shape({
-        DynamoDB: PropTypes.func,
+        DynamoDB: PropTypes.shape({
+          DocumentClient: PropTypes.func,
+        }),
       }),
     }),
     cartItemsLoaded: PropTypes.func.isRequired,
@@ -19,15 +21,9 @@ class CartDataSource extends Component {
 
   constructor(props) {
     super(props)
-    // this.getCartItemsAsync = this.getCartItemsAsync.bind(this)
-    // this.getCartItemsFromDynamoAsync = this.getCartItemsFromDynamoAsync.bind(this)
     this.getCartProductsByUserIdAsync = this.getCartProductsByUserIdAsync.bind(this)
     this.getCartProductsByUserIdFromDynamoAsync = this.getCartProductsByUserIdFromDynamoAsync.bind(this)
-    // this.productsLoaded = this.productsLoaded.bind(this)
-    // this.cartItemsLoaded = this.cartItemsLoaded.bind(this)
     this.componentDidMount = this.componentDidMount.bind(this)
-    console.log('cart-data-source props:')
-    console.log(this.props)
   }
 
   componentDidMount() {
@@ -35,9 +31,8 @@ class CartDataSource extends Component {
     this.docClient = new this.props.awsLogin.aws.DynamoDB.DocumentClient()
 
     if (this.props.userId) {
-      return this.getCartProductsByUserIdAsync(this.props.userId)
-        .then(this.props.cartItemsLoaded)
-        // .then(this.props.productsLoaded)
+      return (this.getCartProductsByUserIdAsync(this.props.userId)
+        .then(this.props.cartItemsLoaded))
     } else {
       return Promise.reject(new Error('userId required'))
     }
@@ -61,6 +56,7 @@ class CartDataSource extends Component {
     return this.getCartProductsByUserIdFromDynamoAsync(userId)
     .then((data) => {
       const cartProductList = []
+
       data.Items.forEach((item) => {
         cartProductList.push({
           productId: item.productId,

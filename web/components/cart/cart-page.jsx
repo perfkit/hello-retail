@@ -33,17 +33,11 @@ class CartPage extends Component {
     })
   }
 
-  // productsLoaded(products) {
-  //   this.setState({
-  //     productItemsList: productItems,
-  //   })
-  // }
-
   render() {
     return (
       <div>
-        <h3><em>Shopping Cart</em></h3>
-        <CartList className="cartList" userId={this.props.awsLogin.state.profile.id.slice(14)} cartList={this.state.cartItemsList} />
+        <h3 className="cartTitle"><em>Shopping Cart</em></h3>
+        <CartList className="cartList" userId={this.props.awsLogin.state.profile.id.slice(14)} cartList={this.state.cartItemsList} awsLogin={this.props.awsLogin} />
         <CartDataSource awsLogin={this.props.awsLogin} userId={this.props.awsLogin.state.profile.id.slice(14)} cartItemsLoaded={this.cartItemsLoaded} />
       </div>
     )
