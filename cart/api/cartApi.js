@@ -22,7 +22,6 @@ const constants = {
   MODULE: 'cart/cartApi.js',
   METHOD_PRODUCTS: 'products',
   TABLE_CART_NAME: process.env.TABLE_CART_NAME,
-  //
   INVALID_REQUEST: 'Invalid Request',
   INTEGRATION_ERROR: 'Integration Error',
   HASHES: '##########################################################################################',
