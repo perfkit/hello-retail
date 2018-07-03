@@ -3,23 +3,15 @@
 const AJV = require('ajv')
 const aws = require('aws-sdk') // eslint-disable-line import/no-unresolved, import/no-extraneous-dependencies
 
-// TODO Get these from a better place later
-// const categoryRequestSchema = require('./products-request-schema.json')
-// const categoryItemsSchema = require('./product-items-schema.json')
 const productsRequestSchema = require('./products-request-schema.json')
 const productItemsSchema = require('./product-items-schema.json')
 
-// TODO generalize this?  it is used by but not specific to this module
 const makeSchemaId = schema => `${schema.self.vendor}/${schema.self.name}/${schema.self.version}`
 
-// const categoryRequestSchemaId = makeSchemaId(categoryRequestSchema)
-// const categoryItemsSchemaId = makeSchemaId(categoryItemsSchema)
 const productsRequestSchemaId = makeSchemaId(productsRequestSchema)
 const productItemsSchemaId = makeSchemaId(productItemsSchema)
 
 const ajv = new AJV()
-// ajv.addSchema(categoryRequestSchema, categoryRequestSchemaId)
-// ajv.addSchema(categoryItemsSchema, categoryItemsSchemaId)
 ajv.addSchema(productsRequestSchema, productsRequestSchemaId)
 ajv.addSchema(productItemsSchema, productItemsSchemaId)
 
@@ -28,11 +20,7 @@ const dynamo = new aws.DynamoDB.DocumentClient()
 const constants = {
   // self
   MODULE: 'cart/cartApi.js',
-  // methods
-  // METHOD_CATEGORIES: 'categories',
   METHOD_PRODUCTS: 'products',
-  // resources
-  // TABLE_PRODUCT_CATEGORY_NAME: process.env.TABLE_PRODUCT_CATEGORY_NAME,
   TABLE_CART_NAME: process.env.TABLE_CART_NAME,
   //
   INVALID_REQUEST: 'Invalid Request',
