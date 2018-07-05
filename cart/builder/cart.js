@@ -76,11 +76,7 @@ const impl = {
       ExpressionAttributeValues: {
         ':c': Date.now(),
         ':u': Date.now().toString(),
-<<<<<<< HEAD
         ':fn': event.origin.slice(event.origin.lastIndexOf("/")+1), // example friendlyName: Jane Smith
-=======
-        ':fn': event.origin.slice(event.origin.lastIndexOf("/")+1),
->>>>>>> 99d49a1026a46a5b8c27383e06a0045982961157
         ':q': 1,
       },
       ReturnValues: 'NONE',
