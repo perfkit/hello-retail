@@ -112,6 +112,7 @@ class ProductDetailPage extends Component {
       margin: '15px',
     }
 
+    console.log(this.state)
     return (
       <div>
         <div>
