@@ -117,6 +117,7 @@ resources:
                 -  Effect: Allow
                    Action:
                      - 'dynamodb:UpdateItem'
+                     - 'dynamodb:DeleteItem'
                    Resource:
                     Fn::Join:
                       - '/'
