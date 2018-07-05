@@ -73,7 +73,7 @@ const impl = {
       },
       ExpressionAttributeValues: {
         ':c': Date.now(),
-        ':u': Date.now(),
+        ':u': Date.now().toString(),
         ':fn': event.origin.slice(event.origin.lastIndexOf("/")+1),
         ':q': 1,
       },
