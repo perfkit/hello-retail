@@ -10,7 +10,14 @@ class CartItem extends Component {
           DocumentClient: PropTypes.func,
         }),
       }),
-    }),
+      state: PropTypes.shape({
+        profile: PropTypes.shape({
+          id: PropTypes.string,
+          name: PropTypes.string,
+        }),
+      }),
+      makeApiRequest: PropTypes.func,
+    }).isRequired,
     productId: PropTypes.string.isRequired,
     quantity: PropTypes.number.isRequired,
   };
@@ -88,11 +95,11 @@ class CartItem extends Component {
   }
 
   removeFromCart() {
-  this.props.awsLogin.makeApiRequest(config.EventWriterApi, 'POST', '/event-writer/', {
-    schema: 'com.nordstrom/cart/remove/1-0-0',
-    id: this.props.productId,
-    origin: `hello-retail/web-client-cart-remove/${this.props.awsLogin.state.profile.id}/${this.props.awsLogin.state.profile.name}`,
-  })
+    this.props.awsLogin.makeApiRequest(config.EventWriterApi, 'POST', '/event-writer/', {
+      schema: 'com.nordstrom/cart/remove/1-0-0',
+      id: this.props.productId,
+      origin: `hello-retail/web-client-cart-remove/${this.props.awsLogin.state.profile.id}/${this.props.awsLogin.state.profile.name}`,
+    })
     .then(() => {
       this.setState({
         removeMessage: 'Deleted from cart.',
@@ -105,19 +112,18 @@ class CartItem extends Component {
       })
     })
 
-  this.setState({
-    removeMessage: 'Deleting from Cart ...',
-  })
-}
+    this.setState({
+      removeMessage: 'Deleting from Cart ...',
+    })
+  }
 
   // TODO: Return cart items by last updatedAt timeout
   // TODO: Add total quantity of cart items near icon or at the top
   render() {
-
     let removeBlurb = null
-    if (!this.state.removeMessage){
+    if (!this.state.removeMessage) {
       removeBlurb = <button onClick={this.removeFromCart}>Delete</button>
-    } else{
+    } else {
       removeBlurb = <h4>{this.state.removeMessage}</h4>
     }
 
