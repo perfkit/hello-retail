@@ -143,7 +143,7 @@ class CartItem extends Component {
         <div>
           { this.state.image ? (<img className="productImage" src={this.state.image} alt={this.state.name} />) : null }
         </div>
-        <div> {removeBlurb}</div>
+        <div>{removeBlurb}</div>
         <br />
       </div>
     )
