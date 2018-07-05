@@ -13,7 +13,9 @@ const productCreateSchema = require('./schemas/product-create-schema.json')
 const userLoginSchema = require('./schemas/user-login-schema.json')
 const updatePhoneSchema = require('./schemas/user-update-phone-schema.json')
 const addRoleSchema = require('./schemas/user-add-role-schema.json')
-const addCartSchema = require('./schemas/product-cart-schema.json')
+// const addCartSchema = require('./schemas/product-cart-schema.json')
+const removeCartSchema = require('./schemas/cart-remove-schema.json')
+const addCartSchema = require('./schemas/cart-add-schema.json')
 
 const productPurchaseSchemaId = makeSchemaId(productPurchaseSchema)
 const productCreateSchemaId = makeSchemaId(productCreateSchema)
@@ -21,12 +23,16 @@ const userLoginSchemaId = makeSchemaId(userLoginSchema)
 const updatePhoneSchemaId = makeSchemaId(updatePhoneSchema)
 const addRoleSchemaId = makeSchemaId(addRoleSchema)
 const addCartSchemaId = makeSchemaId(addCartSchema)
+const removeCartSchemaId = makeSchemaId(removeCartSchema)
+console.log("Add to Cart Schema ID:", addCartSchemaId)
+
 ajv.addSchema(productPurchaseSchema, productPurchaseSchemaId)
 ajv.addSchema(productCreateSchema, productCreateSchemaId)
 ajv.addSchema(userLoginSchema, userLoginSchemaId)
 ajv.addSchema(updatePhoneSchema, updatePhoneSchemaId)
 ajv.addSchema(addRoleSchema, addRoleSchemaId)
 ajv.addSchema(addCartSchema, addCartSchemaId)
+ajv.addSchema(removeCartSchema, removeCartSchemaId)
 
 const constants = {
   INVALID_REQUEST: 'Invalid Request: could not validate request to the schema provided.',
@@ -65,12 +71,16 @@ const impl = {
     if (!eventData.schema || typeof eventData.schema !== 'string') {
       callback(null, impl.clientError('Schema name is missing or not a string in received event.', event))
     } else {
+      console.log("event data", eventData.schema)
       const schema = ajv.getSchema(eventData.schema)
+      console.log("schema", schema)
       if (!schema) {
+        console.log("it didn't work")
         callback(null, impl.clientError(`Schema name ${eventData.schema} is not registered.`, event))
       } else if (!ajv.validate(eventData.schema, eventData)) {
         callback(null, impl.clientError(`Could not validate event to the schema ${eventData.schema}.  Errors: ${ajv.errorsText()}`, event))
       } else {
+        console.log("it worked!")
         const kinesis = new aws.Kinesis()
         const newEvent = {
           Data: JSON.stringify({
