@@ -10,7 +10,14 @@ class CartItem extends Component {
           DocumentClient: PropTypes.func,
         }),
       }),
-    }),
+      state: PropTypes.shape({
+        profile: PropTypes.shape({
+          id: PropTypes.string,
+          name: PropTypes.string,
+        }),
+      }),
+      makeApiRequest: PropTypes.func,
+    }).isRequired,
     productId: PropTypes.string.isRequired,
     quantity: PropTypes.number.isRequired,
   };
@@ -26,6 +33,9 @@ class CartItem extends Component {
     this.getProductByIdFromDynamoAsync = this.getProductByIdFromDynamoAsync.bind(this)
     this.productsLoaded = this.productsLoaded.bind(this)
     this.componentDidMount = this.componentDidMount.bind(this)
+    this.removeFromCart = this.removeFromCart.bind(this)
+    this.state.errors = []
+    this.state.removeMessage = null
   }
 
   componentDidMount() {
@@ -84,9 +94,39 @@ class CartItem extends Component {
     })
   }
 
+  removeFromCart() {
+    this.props.awsLogin.makeApiRequest(config.EventWriterApi, 'POST', '/event-writer/', {
+      schema: 'com.nordstrom/cart/remove/1-0-0',
+      id: this.props.productId,
+      origin: `hello-retail/web-client-cart-remove/${this.props.awsLogin.state.profile.id}/${this.props.awsLogin.state.profile.name}`,
+    })
+    .then(() => {
+      this.setState({
+        removeMessage: 'Deleted from cart.',
+      })
+    })
+    .catch((error) => {
+      console.log(error)
+      this.setState({
+        errors: [error],
+      })
+    })
+
+    this.setState({
+      removeMessage: 'Deleting from Cart ...',
+    })
+  }
+
   // TODO: Return cart items by last updatedAt timeout
   // TODO: Add total quantity of cart items near icon or at the top
   render() {
+    let removeBlurb = null
+    if (!this.state.removeMessage) {
+      removeBlurb = <button onClick={this.removeFromCart}>Delete</button>
+    } else {
+      removeBlurb = <h4>{this.state.removeMessage}</h4>
+    }
+
     return (
       <div>
         <h4>
@@ -103,6 +143,7 @@ class CartItem extends Component {
         <div>
           { this.state.image ? (<img className="productImage" src={this.state.image} alt={this.state.name} />) : null }
         </div>
+        <div>{removeBlurb}</div>
         <br />
       </div>
     )

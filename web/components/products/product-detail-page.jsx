@@ -69,7 +69,7 @@ class ProductDetailPage extends Component {
 
   addToCart() {
     this.props.awsLogin.makeApiRequest(config.EventWriterApi, 'POST', '/event-writer/', {
-      schema: 'com.nordstrom/product/cart/1-0-0',
+      schema: 'com.nordstrom/cart/add/1-0-0',
       id: this.props.params.id,
       origin: `hello-retail/web-client-cart-product/${this.props.awsLogin.state.profile.id}/${this.props.awsLogin.state.profile.name}`,
     })
