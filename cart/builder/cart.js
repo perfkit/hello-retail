@@ -27,7 +27,7 @@ const impl = {
    * {
    *   "schema": "com.nordstrom/retail-stream/1-0-0",
    *   "data": {
-   *     "schema": "com.nordstrom/product/add-cart/1-0-0",
+   *     "schema": "com.nordstrom/cart/add/1-0-0",
    *     "id": "4579874"
    *   }
    *   "origin": "hello-retail/web-client-cart-add/amzn1.account.FFB43IREIOXFBHWJERAQCI9M5JCJ/Jane Smith",
@@ -92,7 +92,7 @@ const impl = {
    * {
    *   "schema": "com.nordstrom/retail-stream/1-0-0",
    *   "data": {
-   *     "schema": "com.nordstrom/product/remove-cart/1-0-0",
+   *     "schema": "com.nordstrom/cart/remove/1-0-0",
    *     "id": "4579874"
    *   }
    *   "origin": "hello-retail/web-client-cart-remove/amzn1.account.FFB43IREIOXFBHWJERAQCI9M5JCJ/Jane Smith",
