@@ -41,6 +41,7 @@ class CartList extends Component {
               quantity={cart.quantity}
               key={cart.createdAt}
               awsLogin={this.props.awsLogin}
+              userId={cart.userId}
             />
           ))
         }
