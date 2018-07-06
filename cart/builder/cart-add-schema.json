@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/schema#",
   "self": {
     "vendor": "com.nordstrom",
-    "name": "product/cart",
+    "name": "cart/add",
     "format": "jsonschema",
     "version": "1-0-0"
   },
@@ -16,4 +16,4 @@
     "id"
   ],
   "additionalProperties": false
-}
+} 
