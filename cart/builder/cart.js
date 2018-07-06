@@ -121,8 +121,8 @@ const impl = {
     const dbParamsCart = {
       TableName: constants.TABLE_CART_NAME,
       Key: {
-          userId: event.origin.slice(event.origin.lastIndexOf(".")+1, event.origin.lastIndexOf("/")),
-          productId: event.data.id,
+          userId: event.origin.slice(event.origin.lastIndexOf(".")+1, event.origin.lastIndexOf("/")), // example userId: FFB43IREIOXFBHWJERAQCI9M5JCJ
+          productId: event.data.id, // example productId: 4579874
       },
     }
     console.log(dbParamsCart)
