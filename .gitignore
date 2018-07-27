@@ -54,18 +54,7 @@ jspm_packages
 web/config.js
 
 # Package locks
-cart/builder/package-lock.json
-event-writer/package-lock.json
 package-lock.json
-product-catalog/api/package-lock.json
-product-catalog/builder/package-lock.json
-product-photos/0.processor/package-lock.json
-product-photos/1.assign/package-lock.json
-product-photos/2.message/package-lock.json
-product-photos/3.receive/package-lock.json
-product-photos/5.unmessage/package-lock.json
-product-photos/6.report/package-lock.json
-web/package-lock.json
 
 # Private data and secrets
 private.yml
