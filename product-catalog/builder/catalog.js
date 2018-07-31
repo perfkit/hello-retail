@@ -104,6 +104,7 @@ const impl = {
         '#n=:n,',
         '#d=:d,',
         '#cat=:cat',
+        '#i=:i'
       ].join(' '),
       ExpressionAttributeNames: {
         '#c': 'created',
@@ -114,6 +115,7 @@ const impl = {
         '#n': 'name',
         '#d': 'description',
         '#cat': 'category',
+        '#i': 'image',
       },
       ExpressionAttributeValues: {
         ':c': updated,
@@ -124,6 +126,7 @@ const impl = {
         ':n': event.data.name,
         ':d': event.data.description,
         ':cat': event.data.category,
+        ':i': event.data.image,
       },
       ReturnValues: 'NONE',
       ReturnConsumedCapacity: 'NONE',

@@ -27,6 +27,7 @@ class NewProductPage extends Component {
     this.nameChange = this.handleProductChange.bind(this, 'name')
     this.brandChange = this.handleProductChange.bind(this, 'brand')
     this.descriptionChange = this.handleProductChange.bind(this, 'description')
+    this.imageChange = this.handleProductChange.bind(this, 'image')
     this.validateProduct = this.validateProduct.bind(this)
     this.resetProduct = this.resetProduct.bind(this)
     this.createProduct = this.createProduct.bind(this)
@@ -37,6 +38,7 @@ class NewProductPage extends Component {
       name: '',
       brand: '',
       description: '',
+      image: '',
     }
 
     this.state = this.emptyProduct
@@ -57,6 +59,7 @@ class NewProductPage extends Component {
         && product.name && product.name.match(/^[\w\d]+/)
         && product.brand && product.brand.match(/^[\w\d]+/)
         && product.description && product.description.match(/^[\w\d]+/)
+        && product.image && product.image.match(/^[\w\d]+/)
       ),
     })
   }
@@ -68,6 +71,7 @@ class NewProductPage extends Component {
       name: '',
       brand: '',
       description: '',
+      image: '',
     })
   }
 
@@ -87,6 +91,7 @@ class NewProductPage extends Component {
       name: product.name.trim(),
       brand: product.brand.trim(),
       description: product.description.trim(),
+      image: product.image.trim(),
     })
     .then(this.resetProduct)
     .catch((error) => {
@@ -148,6 +153,12 @@ class NewProductPage extends Component {
           <label>
             Description:<br />
             <textarea rows="10" value={this.state.description} onChange={this.descriptionChange} />
+          </label>
+        </div>
+        <div>
+          <label>
+            Image Link:<br />
+            <input value={this.state.image} onChange={this.imageChange} />
           </label>
         </div>
         <ValidationErrors errors={this.state.errors} />
