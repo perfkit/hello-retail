@@ -1,0 +1,10 @@
+//1 rem usually = 16 pixel, but 1 rem now = 10 pixels bc of the font-size par
+html {
+    font-size: 62.5%;
+}
+
+body {
+    // background: blue;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: $m-size;
+}
