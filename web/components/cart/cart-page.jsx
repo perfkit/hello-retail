@@ -23,7 +23,6 @@ class CartPage extends Component {
   constructor(props) {
     super(props)
     this.state = {}
-    console.log(this.props)
     this.cartItemsLoaded = this.cartItemsLoaded.bind(this)
   }
 

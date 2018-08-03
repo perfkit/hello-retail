@@ -19,9 +19,6 @@ class ProductCard extends Component {
 
   constructor(props) {
     super(props)
-
-    console.log(props)
-
     this.domainName = 'hello-retail.biz'
 
     if (config.Stage !== 'prod') {

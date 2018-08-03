@@ -83,7 +83,9 @@
     "test",
     "lint"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "react-bootstrap": "^0.32.1"
+  },
   "devDependencies": {
     "ajv": "^4.11.2",
     "aws-sdk": "^2.7.16",
