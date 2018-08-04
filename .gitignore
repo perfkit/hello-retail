@@ -52,3 +52,12 @@ jspm_packages
 
 # Web Project
 web/config.js
+
+# Package locks
+package-lock.json
+
+# Private data and secrets
+private.yml
+
+# Bundle.js - generated every build
+web/app/bundle.js
