@@ -117,3 +117,8 @@ textarea {
     width: 320px;
   }
 } */
+
+
+body {
+  font-family: 'Catamaran' !important;
+}

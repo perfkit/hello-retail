@@ -4,6 +4,7 @@ import AmazonLogin from './login/amazon-login'
 import config from '../config'
 import './styles/styles.scss'
 
+
 class App extends Component {
   constructor(props) {
     super(props)
