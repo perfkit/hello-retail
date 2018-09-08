@@ -273,7 +273,7 @@ const impl = {
     }
     return stepfunctions.sendTaskSuccess(params).promise().then(
       () => BbPromise.resolve(taskEvent),
-      err => BbPromise.reject(`Error sending success to Step Function: ${err}`) // eslint-disable-line comma-dangle
+      err => BbPromise.reject(new ServerError(`Error sending success to Step Function: ${err}`)) // eslint-disable-line comma-dangle
     )
   },
   userErrorResp: (error) => {
