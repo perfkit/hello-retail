@@ -4,25 +4,24 @@ const AJV = require('ajv')
 const aws = require('aws-sdk') // eslint-disable-line import/no-unresolved, import/no-extraneous-dependencies
 const BbPromise = require('bluebird')
 const got = require('got')
-const Twilio = require('twilio')
 const url = require('url')
 
 /**
  * AJV
  */
 // TODO Get these from a better place later
-const twilioRequestSchema = require('./twilio-request-schema.json')
+const photoInputSchema = require('./photo-input-schema.json')
 const photoAssignmentSchema = require('./photo-assignment-schema.json')
 
 // TODO generalize this?  it is used by but not specific to this module
 const makeSchemaId = schema => `${schema.self.vendor}/${schema.self.name}/${schema.self.version}`
 
-const twilioRequestSchemaId = makeSchemaId(twilioRequestSchema)
+const photoInputSchemaId = makeSchemaId(photoInputSchema)
 const photoAssignmentSchemaId = makeSchemaId(photoAssignmentSchema)
 
 
 const ajv = new AJV()
-ajv.addSchema(twilioRequestSchema, twilioRequestSchemaId)
+ajv.addSchema(photoInputSchema, photoInputSchemaId)
 ajv.addSchema(photoAssignmentSchema, photoAssignmentSchemaId)
 
 /**
@@ -33,13 +32,6 @@ const dynamo = new aws.DynamoDB.DocumentClient()
 const kms = new aws.KMS()
 const s3 = new aws.S3()
 const stepfunctions = new aws.StepFunctions()
-
-/**
- * Twilio
- */
-const twilio = {
-  authToken: undefined,
-}
 
 /**
  * Constants
@@ -58,8 +50,6 @@ const constants = {
   MODULE: 'receive.js',
   METHOD_HANDLER: 'handler',
   METHOD_DECRYPT: 'util.decrypt',
-  METHOD_VALIDATE_TWILIO_REQUEST: 'impl.validateTwilioRequest',
-  METHOD_GET_IMAGE_FROM_TWILIO: 'impl.getImageFromTwilio',
   METHOD_PLACE_IMAGE_IN_S3: 'impl.storeImage',
   METHOD_SEND_STEP_SUCCESS: 'impl.sendStepSuccess',
 
@@ -67,7 +57,6 @@ const constants = {
   ENDPOINT: process.env.ENDPOINT,
   IMAGE_BUCKET: process.env.IMAGE_BUCKET,
   TABLE_PHOTO_ASSIGNMENTS_NAME: process.env.TABLE_PHOTO_ASSIGNMENTS_NAME,
-  TWILIO_AUTH_TOKEN_ENCRYPTED: process.env.TWILIO_AUTH_TOKEN_ENCRYPTED,
 }
 
 /**
@@ -127,49 +116,21 @@ const util = {
 /**
  * Implementation (Internal)
  */
-const impl = {
+const impl = { 
   /**
-   * Validate that the given event validates against the request schema
-   * @param event The event representing the HTTPS request from Twilio (SMS sent notification)
+   * Validate the request.
+   * @param event The event representing the HTTPS request
    */
-  validateApiGatewayRequest: (event) => {
-    if (!ajv.validate(twilioRequestSchemaId, event)) { // bad request
-      return BbPromise.reject(new ClientError(`could not validate request to '${twilioRequestSchemaId}' schema. Errors: '${ajv.errorsText()}' found in event: '${JSON.stringify(event)}'`))
-    } else {
-      return BbPromise.resolve(event)
-    }
-  },
-  /**
-   * Ensure that we have decrypted the Twilio credentials and initialized the SDK with them
-   * @param event The event representing the HTTPS request from Twilio (SMS sent notification)
-   */
-  ensureAuthTokenDecrypted: (event) => {
-    if (!twilio.authToken) {
-      return util.decrypt('authToken', constants.TWILIO_AUTH_TOKEN_ENCRYPTED)
-        .then((authToken) => {
-          twilio.authToken = authToken
-          return BbPromise.resolve(event)
-        })
-    } else {
-      return BbPromise.resolve(event)
-    }
-  },
-  /**
-   * Validate the request as having a proper signature from Twilio.  This provides authentication that the request came from Twillio.
-   * @param event The event representing the HTTPS request from Twilio (SMS sent notification)
-   */
-  validateTwilioRequest: (event) => {
+  validateRequest: (event) => {
     const body = url.parse(`?${event.body}`, true).query
-    if (!Twilio.validateRequest(twilio.authToken, event.headers['X-Twilio-Signature'], constants.ENDPOINT, body)) {
-      return BbPromise.reject(new AuthError('Twilio message signature validation failure!'))
-    } else if (body.NumMedia < 1) {
+    if (body.NumMedia < 1) {
       return BbPromise.reject(new UserError('Oops!  We were expecting a product image.  Please send one!  :D'))
-    } else if (body.NumMedia < 1) {
+    } else if (body.NumMedia > 1) {
       return BbPromise.reject(new UserError('Oops!  We can only handle one image.  Sorry... can you please try again?  :D'))
     } else if (!body.MediaContentType0 || !body.MediaContentType0.startsWith('image/')) {
       return BbPromise.reject(new UserError('Oops!  We can only accept standard images.  We weren\'t very creative...'))
     } else if (!body.From) {
-      return BbPromise.reject(new ServerError('Request from Twilio did not contain the phone number the image came from.'))
+      return BbPromise.reject(new ServerError('Request did not contain the phone number/ user ID the image came from.'))
     } else {
       return BbPromise.resolve({
         event,
@@ -178,14 +139,14 @@ const impl = {
     }
   },
   getResources: results => BbPromise.all([
-    impl.getImageFromTwilio(results),
+    impl.getImage(results),
     impl.getAssignment(results),
   ]),
   /**
-   * Twilio sends a URI from which a user's image can downloaded.  Download it.
-   * @param results The event representing the HTTPS request from Twilio (SMS sent notification)
+   * Download image from URI in HTTPS request.
+   * @param results The event representing the HTTPS request
    */
-  getImageFromTwilio: (results) => {
+  getImage: (results) => {
     const uri = url.parse(results.body.MediaUrl0)
     if (aws.config.httpOptions.agent) {
       uri.agent = aws.config.httpOptions.agent
@@ -198,9 +159,8 @@ const impl = {
     )
   },
   /**
-   * The Twilio request doesn't contain any of the original product creation event that caused the assignment.  Obtain the
-   * assignment associated with the number that this message/image is being received from.
-   * @param results The event representing the HTTPS request from Twilio (SMS sent notification)
+   * Obtain the assignment associated with the number/ID that this message/image is being received from.
+   * @param results The event representing the HTTPS request
    */
   getAssignment: (results) => {
     const params = {
@@ -230,11 +190,11 @@ const impl = {
       )
   },
   /**
-   * Using the results of the `getImageFromTwilio` and `getAssignment` invocations, place the obtained image into the
+   * Using the results of the `getImage` and `getAssignment` invocations, place the obtained image into the
    * proper location of the bucket for use in the web UI.
    * @param results An array of results obtained from `getResources`.  Details:
-   *          results[0] = image       // The user's image that was downloaded from Twilio
-   *          results[1] = assignment  // The assignment associated with the given request's phone number
+   *          results[0] = image       // The user's image that was downloaded
+   *          results[1] = assignment  // The assignment associated with the given request's phone number/ID
    */
   storeImage: (results) => {
     const image = results[0]
@@ -277,14 +237,10 @@ const impl = {
     )
   },
   userErrorResp: (error) => {
-    const msg = new Twilio.TwimlResponse()
-    msg.message(error.message)
-    return msg.toString()
+    return error.message
   },
   thankYouForImage: (taskEvent) => {
-    const msg = new Twilio.TwimlResponse()
-    msg.message(`Thanks so much ${taskEvent.photographer.name}!`)
-    return msg.toString()
+    return `Thanks so much ${taskEvent.photographer.name}!`
   },
 }
 /**
@@ -292,9 +248,7 @@ const impl = {
  */
 module.exports = {
   handler: (event, context, callback) => {
-    impl.validateApiGatewayRequest(event)
-      .then(impl.ensureAuthTokenDecrypted)
-      .then(impl.validateTwilioRequest)
+    impl.validateRequest(event)
       .then(impl.getResources)
       .then(impl.storeImage)
       .then(impl.sendStepSuccess)
