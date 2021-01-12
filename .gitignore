@@ -58,6 +58,8 @@ package-lock.json
 
 # Private data and secrets
 private.yml
+install.sh
+deploy.sh
 
 # Bundle.js - generated every build
 web/app/bundle.js
