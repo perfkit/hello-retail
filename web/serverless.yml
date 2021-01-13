@@ -14,9 +14,6 @@ custom:
         - Ref: HelloRetailWebBucket
         - '/*'
 
-  oAuthClientId: ${self:custom.private.loginWithAmazonClientId}
-  oAuthAppId: ${self:custom.private.loginWithAmazonAppId}
-
   # Domain name for CloudFront distribution.
   cloudFrontDomainName:
     Fn::GetAtt:
@@ -70,9 +67,6 @@ custom:
         - Ref: HelloRetailWebBucket
         - '/'
 
-  # SSL Certificate to use for Cloud Front.
-  sslCert: ${self:custom.private.websiteSSLCert}
-
   # Stage name for deployment. Use 'prod' to deploy to production.
   stage: ${opt:stage, self:provider.stage, self:custom.private.stage}
 
@@ -82,7 +76,6 @@ custom:
     configValues:
       WebAppName: Hello Retail
       Stage: ${self:custom.stage}
-      AuthClientId: ${self:custom.oAuthClientId}
       AWSRegion: ${self:custom.private.region}
       SessionName: ${self:custom.helloRetail.name}-website-${self:custom.stage}
       # TODO: Create this role as part of this stack
@@ -132,9 +125,6 @@ resources:
               Principal:
                 Federated: www.amazon.com
               Action: sts:AssumeRoleWithWebIdentity
-              Condition:
-                StringEquals:
-                  www.amazon.com:app_id: ${self:custom.oAuthAppId}
         ManagedPolicyArns:
           - ${self:custom.private.teamPolicy}
         Policies:
@@ -236,10 +226,7 @@ resources:
               QueryString: false
               Cookies:
                 Forward: none
-            ViewerProtocolPolicy: redirect-to-https
-          ViewerCertificate:
-            SslSupportMethod: sni-only
-            AcmCertificateArn: ${self:custom.sslCert}
+            ViewerProtocolPolicy: allow-all
       DependsOn:
         - HelloRetailWebBucket
 

@@ -1,4 +1,3 @@
-/* global window */
 import AWS from 'aws-sdk'
 import https from 'https'
 import loadjs from 'loadjs'
@@ -20,119 +19,39 @@ class AmazonLogin extends Component {
       webAppRole: config.WebAppRole,
     }
 
-    // Amazon auth options passed to authorize()
-    this.authOptions = {
-      scope: 'profile',
-    }
-
-    this.assumeWebAppIdentityWithToken = this.assumeWebAppIdentityWithToken.bind(this)
-    this.authAmazonLogin = this.authAmazonLogin.bind(this)
-    this.componentWillMount = this.componentWillMount.bind(this)
     this.loginClicked = this.loginClicked.bind(this)
-    this.retrieveProfile = this.retrieveProfile.bind(this)
+	this.handleIDInput = this.handleIDInput.bind(this)
+	this.handleProfileInput = this.handleProfileInput.bind(this)
     this.sendUserLogin = this.sendUserLogin.bind(this)
     this.performLoginAndAssumeIdentity = this.performLoginAndAssumeIdentity.bind(this)
 
     this.state = {
-      amazonLoginReady: false,
-      autoLoginFailed: false,
+	  profile_name_input: "",
+	  id_input: "",
     }
-  }
-
-  componentWillMount() {
-    const that = this
-    window.onAmazonLoginReady = () => {
-      that.setState({
-        amazonLoginReady: true,
-      })
-
-      this.performLoginAndAssumeIdentity('never')
-    }
-
-    loadjs('https://api-cdn.amazon.com/sdk/login1.js')
-  }
-
-  authAmazonLogin(interactive) {
-    const that = this
-
-    this.authOptions.interactive = interactive
-
-    return new Promise((resolve, reject) => {
-      window.amazon.Login.setClientId(that.loginConfig.clientId)
-      window.amazon.Login.authorize(that.authOptions, (response) => {
-        if (response.error) { reject(response.error) }
-        resolve(response)
-      })
-    })
-  }
-
-  assumeWebAppIdentityWithToken(token) {
-    const params = {
-      DurationSeconds: 3600,
-      ProviderId: 'www.amazon.com',
-      RoleArn: this.loginConfig.webAppRole,
-      RoleSessionName: this.loginConfig.sessionName,
-      WebIdentityToken: token,
-    }
-    return this.sts.assumeRoleWithWebIdentity(params).promise()
   }
 
   performLoginAndAssumeIdentity(interactive) {
     const that = this
-    this.sts = new AWS.STS()
-
-    this.authAmazonLogin(interactive)
-      .then((loginResponse) => {
-        that.accessToken = loginResponse.access_token
-        return that.assumeWebAppIdentityWithToken(loginResponse.access_token)
-      })
-      .then((identity) => {
-        that.webApplicationIdentityCredentials = {
-          accessKeyId: identity.Credentials.AccessKeyId,
-          secretAccessKey: identity.Credentials.SecretAccessKey,
-          sessionToken: identity.Credentials.SessionToken,
-        }
-
-        return that.retrieveProfile()
-      })
-      .then((profile) => {
-        that.setState({
-          profile: {
-            id: profile.CustomerId,
-            name: profile.Name,
-          },
-        })
-
-        that.aws = AWS
-        AWS.config.credentials = that.webApplicationIdentityCredentials
-        AWS.config.region = that.loginConfig.awsRegion
-
-        return that.sendUserLogin()
-      })
-      .then(() => {
-        that.props.awsLoginComplete(that)
-      })
-      .catch(() => {
-        that.setState({
-          autoLoginFailed: true,
-        })
-      })
+	that.setState({
+	  profile: {
+		id: this.state.id_input,
+		name: this.state.profile_name_input,
+	  },
+	})
+    that.sendUserLogin().then(() => {that.props.awsLoginComplete(that)})
   }
 
   loginClicked() {
     this.performLoginAndAssumeIdentity('auto')
   }
-
-  retrieveProfile() {
-    return new Promise((resolve, reject) => {
-      window.amazon.Login.retrieveProfile(this.accessToken, (response) => {
-        if (!response.success) {
-          reject('Failed to get Amazon Login profile')
-        } else {
-          resolve(response.profile)
-        }
-      })
-    })
+  
+  handleProfileInput = event => {
+    this.setState({ profile_name_input: event.target.value });  
+  }
+  
+  handleIDInput = event => {
+    this.setState({ id_input: event.target.value });  
   }
 
   sendUserLogin() {
@@ -176,19 +95,13 @@ class AmazonLogin extends Component {
   }
 
   render() {
-    if (!this.state.amazonLoginReady || !this.state.autoLoginFailed) {
-      return (<div> Waiting for Amazon Login...</div>)
-    }
-
     return (
-      <div id="amazon-root">
-        <button onClick={this.loginClicked} className="awsLoginButton">
-          <img
-            src="https://images-na.ssl-images-amazon.com/images/G/01/lwa/btnLWA_gold_156x32.png"
-            disabled={!this.state.amazonLoginReady}
-            alt="Amazon Login"
-          />
-        </button>
+      <div id="login-root">
+		<label for="input_id">ID:</label>
+		<input type="text" id="input_id" name="input_id" onChange={this.handleIDInput}>
+		<label for="input_profile_name">Profile Name:</label>
+		<input type="text" id="input_profile_name" name="input_profile_name" onChange={this.handleProfileInput}>
+        <button onClick={this.loginClicked}>Login</button>
       </div>
     )
   }
