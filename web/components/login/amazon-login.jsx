@@ -98,12 +98,12 @@ class AmazonLogin extends Component {
     return (
       <div id="login-root">
 		<label for="input_id">ID:</label>
-		<input type="text" id="input_id" name="input_id" onChange={this.handleIDInput}>
+		<input type="text" id="input_id" name="input_id" onChange={this.handleIDInput}/>
 		<label for="input_profile_name">Profile Name:</label>
-		<input type="text" id="input_profile_name" name="input_profile_name" onChange={this.handleProfileInput}>
+		<input type="text" id="input_profile_name" name="input_profile_name" onChange={this.handleProfileInput}/>
         <button onClick={this.loginClicked}>Login</button>
       </div>
-    )
+    );
   }
 }
 
