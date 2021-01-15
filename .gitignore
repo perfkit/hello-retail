@@ -60,6 +60,7 @@ package-lock.json
 private.yml
 install.sh
 deploy.sh
+remove.sh
 
 # Bundle.js - generated every build
 web/app/bundle.js
