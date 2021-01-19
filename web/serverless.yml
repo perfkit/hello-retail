@@ -96,7 +96,8 @@ custom:
 
 provider:
   name: aws
-  deploymentBucket: com.${self:custom.private.company}.${self:custom.private.team}.serverless.${self:provider.region}
+  runtime: nodejs12.x
+  # deploymentBucket: com.${self:custom.private.company}.${self:custom.private.team}.serverless.${self:provider.region}
   profile: ${self:custom.private.profile}
   region: ${self:custom.private.region}
 
