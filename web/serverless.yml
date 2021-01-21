@@ -96,7 +96,7 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  # runtime: nodejs12.x
   # deploymentBucket: com.${self:custom.private.company}.${self:custom.private.team}.serverless.${self:provider.region}
   profile: ${self:custom.private.profile}
   region: ${self:custom.private.region}
@@ -123,9 +123,9 @@ resources:
           Version: '2012-10-17'
           Statement:
             - Effect: Allow
+              Action: sts:AssumeRole
               Principal:
-                Federated: www.amazon.com
-              Action: sts:AssumeRoleWithWebIdentity
+                Service: lambda.amazonaws.com
         ManagedPolicyArns:
           - ${self:custom.private.teamPolicy}
         Policies:
@@ -213,8 +213,8 @@ resources:
               ResponseCode: 200
               ResponsePagePath: /error.html
           DefaultRootObject: index.html
-          Aliases:
-          - ${self:custom.dnsHostName}
+          #Aliases:
+          #- ${self:custom.dnsHostName}
           DefaultCacheBehavior:
             AllowedMethods:
             - GET
@@ -233,23 +233,23 @@ resources:
 
     # ================= Route 53 ===================
 
-    HelloRetailWebRecordSetGroup:
-      Type: AWS::Route53::RecordSetGroup
-      Properties:
-        HostedZoneName: ${self:custom.domainName}.
-        RecordSets:
-        - Name: ${self:custom.dnsHostName}
-          Type: A
-          AliasTarget:
-            DNSName: ${self:custom.cloudFrontDomainName}
-            HostedZoneId: ${self:custom.cloudFrontHostedZoneId}
-        - Name: ${self:custom.dnsHostName}
-          Type: AAAA
-          AliasTarget:
-            DNSName: ${self:custom.cloudFrontDomainName}
-            HostedZoneId: ${self:custom.cloudFrontHostedZoneId}
-      DependsOn:
-        - HelloRetailWebDistribution
+    #HelloRetailWebRecordSetGroup:
+    #  Type: AWS::Route53::RecordSetGroup
+    #  Properties:
+    #    HostedZoneName: ${self:custom.domainName}.
+    #    RecordSets:
+    #    - Name: ${self:custom.dnsHostName}
+    #      Type: A
+    #      AliasTarget:
+    #        DNSName: ${self:custom.cloudFrontDomainName}
+    #        HostedZoneId: ${self:custom.cloudFrontHostedZoneId}
+    #    - Name: ${self:custom.dnsHostName}
+    #      Type: AAAA
+    #      AliasTarget:
+    #        DNSName: ${self:custom.cloudFrontDomainName}
+    #        HostedZoneId: ${self:custom.cloudFrontHostedZoneId}
+    #  DependsOn:
+    #    - HelloRetailWebDistribution
 
   # ================= Outputs ===================
 

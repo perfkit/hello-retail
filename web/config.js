@@ -7,5 +7,5 @@ module.exports = {
  'ProductCatalogTableName': 'prod-ProductCatalog-1',
  'ProductCategoryTableName': 'prod-ProductCategory-1',
  'CartTableName': 'prod-Cart',
- 'EventWriterApi': '2bdge4err8',
+ 'EventWriterApi': 'on2xdhmtoe',
 }
