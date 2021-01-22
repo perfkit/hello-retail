@@ -22,45 +22,35 @@ class AmazonLogin extends Component {
     this.loginClicked = this.loginClicked.bind(this)
 	this.handleIDInput = this.handleIDInput.bind(this)
 	this.handleProfileInput = this.handleProfileInput.bind(this)
-    this.sendUserLogin = this.sendUserLogin.bind(this)
-    this.performLoginAndAssumeIdentity = this.performLoginAndAssumeIdentity.bind(this)
 
     this.state = {
-	  profile_name_input: "",
-	  id_input: "",
+	  profile: {
+		id: "",
+		name: "",
+	  }
     }
   }
 
-  performLoginAndAssumeIdentity(interactive) {
-    const that = this
-	that.setState({
-	  profile: {
-		id: this.state.id_input,
-		name: this.state.profile_name_input,
-	  },
-	})
-    that.sendUserLogin().then(() => {that.props.awsLoginComplete(that)})
-  }
-
   loginClicked() {
-    this.performLoginAndAssumeIdentity('auto')
-  }
-  
-  handleProfileInput = event => {
-    this.setState({ profile_name_input: event.target.value });  
-  }
-  
-  handleIDInput = event => {
-    this.setState({ id_input: event.target.value });  
-  }
-
-  sendUserLogin() {
     this.makeApiRequest(config.EventWriterAPI, 'POST', '/event-writer/', {
       schema: 'com.nordstrom/user-info/login/1-0-0',
       id: this.state.profile.id,
       name: this.state.profile.name,
       origin: `hello-retail/web-client-login-user/${this.state.profile.id}/${this.state.profile.name}`,
     })
+	this.props.awsLoginComplete(this)
+  }
+  
+  handleProfileInput = event => {
+	var prof = {...this.state.profile}
+	prof.name = event.target.value
+    this.setState({prof});
+  }
+  
+  handleIDInput = event => {
+    var prof = {...this.state.profile}
+	prof.id = event.target.value
+    this.setState({prof});
   }
 
   makeApiRequest(api, verb, path, data) {
@@ -79,9 +69,6 @@ class AmazonLogin extends Component {
       request.body = body
       request.headers.Host = endpoint.host
 
-      const signer = new AWS.Signers.V4(request, 'execute-api')
-      signer.addAuthorization(this.webApplicationIdentityCredentials, new Date())
-
       const postRequest = https.request(request, (response) => {
         let result = ''
         response.on('data', (d) => { result += d })
@@ -97,9 +84,9 @@ class AmazonLogin extends Component {
   render() {
     return (
       <div id="login-root">
-		<label for="input_id">ID:</label>
+		<label>ID:</label>
 		<input type="text" id="input_id" name="input_id" onChange={this.handleIDInput}/>
-		<label for="input_profile_name">Profile Name:</label>
+		<label>Profile Name:</label>
 		<input type="text" id="input_profile_name" name="input_profile_name" onChange={this.handleProfileInput}/>
         <button onClick={this.loginClicked}>Login</button>
       </div>
