@@ -1,20 +1,15 @@
+import AWS from 'aws-sdk'
 import { Component, PropTypes } from 'react'
 import config from '../../config'
 
 class ProductDataSource extends Component {
   static propTypes = {
-    awsLogin: PropTypes.shape({
-      aws: PropTypes.shape({
-        DynamoDB: PropTypes.func,
-      }),
-    }),
     category: PropTypes.string,
     productId: PropTypes.string,
     productsLoaded: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
-    awsLogin: null,
     category: null,
     productId: null,
   }
@@ -28,7 +23,7 @@ class ProductDataSource extends Component {
   }
 
   componentDidMount() {
-    this.dynamo = new this.props.awsLogin.aws.DynamoDB()
+    this.dynamo = new AWS.DynamoDB()
 
     if (this.props.category) {
       return this.getProductsByCategoryAsync(this.props.category)

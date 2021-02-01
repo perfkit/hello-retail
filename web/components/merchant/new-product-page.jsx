@@ -1,24 +1,10 @@
-import React, { Component, PropTypes } from 'react'
+import AWS from 'aws-sdk'
+import https from 'https'
+import React, {Component} from 'react'
 import ValidationErrors from '../validation-errors'
 import config from '../../config'
 
 class NewProductPage extends Component {
-  // TODO: DRY up all these duplicate propType declarations everywhere
-  static propTypes = {
-    awsLogin: PropTypes.shape({
-      state: PropTypes.shape({
-        profile: PropTypes.shape({
-          id: PropTypes.string,
-          name: PropTypes.string,
-        }),
-      }),
-      makeApiRequest: PropTypes.func,
-    }),
-  }
-
-  static defaultProps = {
-    awsLogin: null,
-  }
 
   constructor(props) {
     super(props)
@@ -71,6 +57,34 @@ class NewProductPage extends Component {
     })
   }
 
+  makeApiRequest(api, verb, path, data) {
+    return new Promise((resolve, reject) => {
+      // https://{restapi_id}.execute-api.{region}.amazonaws.com/{stage_name}/
+      const apiPath = `/${config.Stage}${path}`
+      const body = JSON.stringify(data)
+      const hostname = `${api}.execute-api.${config.AWSRegion}.amazonaws.com`
+      const endpoint = new AWS.Endpoint(hostname)
+      const request = new AWS.HttpRequest(endpoint)
+
+      request.method = verb
+      request.path = apiPath
+      request.region = config.AWSRegion
+      request.host = endpoint.host
+      request.body = body
+      request.headers.Host = endpoint.host
+
+      const postRequest = https.request(request, (response) => {
+        let result = ''
+        response.on('data', (d) => { result += d })
+        response.on('end', () => resolve(result))
+        response.on('error', error => reject(error))
+      })
+
+      postRequest.write(body)
+      postRequest.end()
+    })
+  }
+
   createProduct() {
     const product = this.state
 
@@ -79,10 +93,10 @@ class NewProductPage extends Component {
       isProductValid: false,
     })
 
-    this.props.awsLogin.makeApiRequest(config.EventWriterApi, 'POST', '/event-writer/', {
+    this.makeApiRequest(config.EventWriterApi, 'POST', '/event-writer/', {
       schema: 'com.nordstrom/product/create/1-0-0',
       id: (`0000000${Math.floor(Math.abs(Math.random() * 10000000))}`).substr(-7),
-      origin: `hello-retail/web-client-create-product/${this.props.awsLogin.state.profile.id}/${this.props.awsLogin.state.profile.name}`,
+      origin: `hello-retail/web-client-create-product/dummy_id/dummy_name`,
       category: product.category.trim(),
       name: product.name.trim(),
       brand: product.brand.trim(),

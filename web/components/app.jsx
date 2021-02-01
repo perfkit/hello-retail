@@ -1,37 +1,18 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router'
-import AmazonLogin from './login/amazon-login'
 import config from '../config'
 
 class App extends Component {
   constructor(props) {
     super(props)
-    this.state = {
-      loggedIn: false,
-    }
-    this.awsLoginHandler = this.awsLoginHandler.bind(this)
-  }
-
-  awsLoginHandler(awsLogin) {
-    this.setState({
-      loggedIn: true,
-      awsLogin,
-    })
   }
 
   render() {
     const app = this
     let children = null
 
-    if (!this.state.loggedIn) {
-      children = (<AmazonLogin awsLoginComplete={this.awsLoginHandler} />)
-    } else {
-      // Maps properties to child components dynamically, allowing those properties to be bound once available.
-      children = React.Children.map(this.props.children, child => React.cloneElement(child, { // eslint-disable-line react/prop-types
-        AWS: app.state.AWS,
-        awsLogin: app.state.awsLogin,
-      }))
-    }
+    // Maps properties to child components dynamically, allowing those properties to be bound once available.
+    children = React.Children.map(this.props.children, child => React.cloneElement(child, {}))
 
     return (
       <div>
@@ -39,7 +20,7 @@ class App extends Component {
         <Link className="cartLink glyphicon glyphicon-shopping-cart" to={'/cart'} />
         <div className="app text-center container" >
           <h1>{config.WebAppName}</h1>
-          { this.state.loggedIn ? (<h4>Welcome, <em>{app.state.awsLogin.state.profile.name}</em></h4>) : null }
+            <h4>Welcome</h4>
           <hr />
           <div className="content">
             {children}

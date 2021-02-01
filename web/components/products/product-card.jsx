@@ -22,12 +22,6 @@ class ProductCard extends Component {
 
     console.log(props)
 
-    this.domainName = 'hello-retail.biz'
-
-    if (config.Stage !== 'prod') {
-      this.domainName = `${config.Stage}.${this.domainName}`
-    }
-
     this.state = {}
   }
 

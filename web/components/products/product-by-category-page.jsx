@@ -6,7 +6,6 @@ import ProductDataSource from './product-data-source'
 
 class ProductCategoryPage extends Component {
   static propTypes = {
-    awsLogin: PropTypes.shape({}).isRequired,
     params: PropTypes.shape({
       category: PropTypes.string.isRequired,
     }).isRequired,
@@ -31,7 +30,7 @@ class ProductCategoryPage extends Component {
       <div>
         <h3>{this.state.category}</h3>
         <ProductList products={this.state.productsList} category={this.state.category} />
-        <ProductDataSource awsLogin={this.props.awsLogin} category={this.state.category} productsLoaded={this.productsLoaded} />
+        <ProductDataSource category={this.state.category} productsLoaded={this.productsLoaded} />
       </div>
     )
   }
