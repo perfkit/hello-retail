@@ -1,30 +1,14 @@
+import AWS from 'aws-sdk'
+import https from 'https'
 import React, { Component, PropTypes } from 'react'
 import { Link } from 'react-router'
 import config from '../../config'
 
 class CartItem extends Component {
   static propTypes = {
-    awsLogin: PropTypes.shape({
-      aws: PropTypes.shape({
-        DynamoDB: PropTypes.shape({
-          DocumentClient: PropTypes.func,
-        }),
-      }),
-      state: PropTypes.shape({
-        profile: PropTypes.shape({
-          id: PropTypes.string,
-          name: PropTypes.string,
-        }),
-      }),
-      makeApiRequest: PropTypes.func,
-    }).isRequired,
     productId: PropTypes.string.isRequired,
     quantity: PropTypes.number.isRequired,
   };
-
-  static defaultProps = {
-    awsLogin: null,
-  }
 
   constructor(props) {
     super(props)
@@ -38,9 +22,37 @@ class CartItem extends Component {
     this.state.removeMessage = null
   }
 
+  makeApiRequest(api, verb, path, data) {
+    return new Promise((resolve, reject) => {
+      // https://{restapi_id}.execute-api.{region}.amazonaws.com/{stage_name}/
+      const apiPath = `/${config.Stage}${path}`
+      const body = JSON.stringify(data)
+      const hostname = `${api}.execute-api.${config.AWSRegion}.amazonaws.com`
+      const endpoint = new AWS.Endpoint(hostname)
+      const request = new AWS.HttpRequest(endpoint)
+
+      request.method = verb
+      request.path = apiPath
+      request.region = config.AWSRegion
+      request.host = endpoint.host
+      request.body = body
+      request.headers.Host = endpoint.host
+
+      const postRequest = https.request(request, (response) => {
+        let result = ''
+        response.on('data', (d) => { result += d })
+        response.on('end', () => resolve(result))
+        response.on('error', error => reject(error))
+      })
+
+      postRequest.write(body)
+      postRequest.end()
+    })
+  }
+
   componentDidMount() {
-    this.dynamo = new this.props.awsLogin.aws.DynamoDB()
-    this.docClient = new this.props.awsLogin.aws.DynamoDB.DocumentClient()
+    this.dynamo = new AWS.DynamoDB()
+    this.docClient = new this.dynamo.DocumentClient()
 
     if (this.props.productId) {
       return (this.getProductsByIdAsync(this.props.productId)
@@ -95,10 +107,10 @@ class CartItem extends Component {
   }
 
   removeFromCart() {
-    this.props.awsLogin.makeApiRequest(config.EventWriterApi, 'POST', '/event-writer/', {
+    this.makeApiRequest(config.EventWriterApi, 'POST', '/event-writer/', {
       schema: 'com.nordstrom/cart/remove/1-0-0',
       id: this.props.productId,
-      origin: `hello-retail/web-client-cart-remove/${this.props.awsLogin.state.profile.id}/${this.props.awsLogin.state.profile.name}`,
+      origin: `hello-retail/web-client-cart-remove/dummy_id/dummy_name`,
     })
     .then(() => {
       this.setState({

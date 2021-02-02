@@ -17,7 +17,7 @@ class App extends Component {
     return (
       <div>
         <Link className="homeLink glyphicon glyphicon-home" to={'/'} />
-        <Link className="cartLink glyphicon glyphicon-shopping-cart" to={'/cart'} />
+        <Link className="cartLink glyphicon glyphicon-shopping-cart" to={'/cart/placeholderid'} />
         <div className="app text-center container" >
           <h1>{config.WebAppName}</h1>
             <h4>Welcome</h4>

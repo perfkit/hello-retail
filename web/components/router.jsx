@@ -21,7 +21,7 @@ ReactDOM.render(
       <Route path="photographer" component={PhotographerRegisterPage} />
       <Route path="category/:category" component={ProductCategoryPage} />
       <Route path="product/:id" component={ProductDetailPage} />
-      <Route path="cart" component={CartPage} />
+      <Route path="cart/:id" component={CartPage} />
     </Route>
   </Router>),
   document.getElementById('root'),

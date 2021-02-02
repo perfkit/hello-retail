@@ -1,18 +1,10 @@
+import AWS from 'aws-sdk'
 import { Component, PropTypes } from 'react'
 import config from '../../config'
 
 class CategoryDataSource extends Component {
   static propTypes = {
-    awsLogin: PropTypes.shape({
-      aws: PropTypes.shape({
-        DynamoDB: PropTypes.func,
-      }),
-    }),
     categoriesLoaded: PropTypes.func.isRequired,
-  }
-
-  static defaultProps = {
-    awsLogin: null,
   }
 
   constructor(props) {
@@ -23,7 +15,7 @@ class CategoryDataSource extends Component {
   }
 
   componentDidMount() {
-    this.dynamo = new this.props.awsLogin.aws.DynamoDB()
+    this.dynamo = new AWS.DynamoDB()
 
     this.getCategoriesAsync()
       .then(this.props.categoriesLoaded)

@@ -1,21 +1,14 @@
+import AWS from 'aws-sdk'
 import { Component, PropTypes } from 'react'
 import config from '../../config'
 
 class CartDataSource extends Component {
   static propTypes = {
-    awsLogin: PropTypes.shape({
-      aws: PropTypes.shape({
-        DynamoDB: PropTypes.shape({
-          DocumentClient: PropTypes.func,
-        }),
-      }),
-    }),
     cartItemsLoaded: PropTypes.func.isRequired,
     userId: PropTypes.string,
   }
 
   static defaultProps = {
-    awsLogin: null,
     userId: null,
   }
 
@@ -27,8 +20,8 @@ class CartDataSource extends Component {
   }
 
   componentDidMount() {
-    this.dynamo = new this.props.awsLogin.aws.DynamoDB()
-    this.docClient = new this.props.awsLogin.aws.DynamoDB.DocumentClient()
+    this.dynamo = new AWS.DynamoDB()
+    this.docClient = new this.dynamo.DocumentClient()
 
     if (this.props.userId) {
       return (this.getCartProductsByUserIdAsync(this.props.userId)
