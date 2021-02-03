@@ -100,6 +100,9 @@ provider:
   # deploymentBucket: com.${self:custom.private.company}.${self:custom.private.team}.serverless.${self:provider.region}
   profile: ${self:custom.private.profile}
   region: ${self:custom.private.region}
+  environment:
+    AWSSECRETKEY: ${self:custom.private.secretKey}
+    AWSACCESSKEY: ${self:custom.private.accessKey}
 
 resources:
   Conditions:

@@ -21,7 +21,7 @@ class CartDataSource extends Component {
 
   componentDidMount() {
     this.dynamo = new AWS.DynamoDB()
-    this.docClient = new this.dynamo.DocumentClient()
+    this.docClient = new AWS.DynamoDB.DocumentClient()
 
     if (this.props.userId) {
       return (this.getCartProductsByUserIdAsync(this.props.userId)

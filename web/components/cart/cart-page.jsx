@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, {Component, PropTypes} from 'react'
 import CartList from './cart-list'
 import CartDataSource from './cart-data-source'
 
