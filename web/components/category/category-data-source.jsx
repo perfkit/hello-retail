@@ -1,6 +1,6 @@
-import AWS from 'aws-sdk'
 import { Component, PropTypes } from 'react'
 import config from '../../config'
+import * as util from '../util'
 
 class CategoryDataSource extends Component {
   static propTypes = {
@@ -10,30 +10,24 @@ class CategoryDataSource extends Component {
   constructor(props) {
     super(props)
     this.getCategoriesAsync = this.getCategoriesAsync.bind(this)
-    this.getCategoriesFromDynamoAsync = this.getCategoriesFromDynamoAsync.bind(this)
+    this.getCategoriesFromApiAsync = this.getCategoriesFromApiAsync.bind(this)
     this.componentDidMount = this.componentDidMount.bind(this)
   }
 
   componentDidMount() {
-    this.dynamo = new AWS.DynamoDB()
-
     this.getCategoriesAsync()
       .then(this.props.categoriesLoaded)
   }
 
-  getCategoriesFromDynamoAsync() {
-    const params = {
-      TableName: config.ProductCategoryTableName,
-      AttributesToGet: ['category'],
-    }
-    return this.dynamo.scan(params).promise()
+  getCategoriesFromApiAsync() {
+    return util.makeApiRequest(config.ProductCatalogApi, 'GET', '/categories', {})
   }
 
   getCategoriesAsync() {
-    return this.getCategoriesFromDynamoAsync()
-      .then((data) => { // report successful results
+    return this.getCategoriesFromApiAsync()
+      .then((data) => {
         const categoriesList = []
-        data.Items.forEach((item) => {
+        JSON.parse(data).Items.forEach((item) => {  //TODO evtl rework
           categoriesList.push({
             name: item.category.S,
           })

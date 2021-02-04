@@ -11,6 +11,9 @@ custom:
   productCatalogBuilderVersion: 1
   productCatalogBuilder: ${file(../builder/serverless.yml)}
   productCatalogApiVersion: 1
+  productCatalogApi: ${self:}
+  # Exports
+  exportProductCatalogRestApi: ${self:custom.productCatalogApi.service}:${self:custom.stage}:ProductCatalogRestApi:${self:custom.productCatalogApiVersion}
 
 provider:
   name: aws
@@ -135,14 +138,21 @@ resources:
             PolicyDocument:
               Version: '2012-10-17'
               Statement:
-# TODO enable once we are getting single items.
-#                -  Effect: Allow
-#                   Action:
-#                     - 'dynamodb:GetItem'
-#                   Resource:
-#                    Fn::ImportValue: ${self:custom.productCatalogBuilder.custom.exportProductCatalogTableArn}
+                -  Effect: Allow
+                   Action:
+                     - 'dynamodb:GetItem'
+                   Resource:
+                    Fn::ImportValue: ${self:custom.productCatalogBuilder.custom.exportProductCatalogTableArn}
                 -  Effect: Allow
                    Action:
                      - 'dynamodb:Query'
                    Resource:
                     Fn::ImportValue: ${self:custom.productCatalogBuilder.custom.exportProductCatalogTableCategoryIndexArn}
+
+  Outputs:
+    ProductCatalogRestApi:
+      Description: API used to access the product and category catalog in DynamoDB
+      Value:
+        Ref: ApiGatewayRestApi
+      Export:
+        Name: ${self:custom.productCatalogApi.custom.exportProductCatalogRestApi}

@@ -1,19 +1,10 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router'
 import config from '../config'
-const AWS = require('aws-sdk');
-import * as env from 'process';
 
 class App extends Component {
   constructor(props) {
     super(props)
-    AWS.config.update({
-      region: config.AWSRegion,
-      secretAccessKey: env.AWSSECRETKEY,
-      accessKeyId: env.AWSACCESSKEY,
-    });
-    console.log(process.env.AWSSECRETKEY) //DEBUG
-    console.log(process.env.AWSACCESSKEY) //DEBUG
   }
 
   render() {
@@ -26,7 +17,6 @@ class App extends Component {
     return (
       <div>
         <Link className="homeLink glyphicon glyphicon-home" to={'/'} />
-        <Link className="cartLink glyphicon glyphicon-shopping-cart" to={'/cart/placeholderid'} />
         <div className="app text-center container" >
           <h1>{config.WebAppName}</h1>
             <h4>Welcome</h4>

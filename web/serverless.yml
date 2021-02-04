@@ -58,7 +58,8 @@ custom:
   eventWriterApi: ${file(../event-writer/serverless.yml)}
   productCatalogBuilderVersion: 1
   productCatalogBuilder: ${file(../product-catalog/builder/serverless.yml)}
-  cartBuilder: ${file(../cart/builder/serverless.yml)}
+  productCatalogApiVersion: 1
+  productCatalogApi: ${file(../product-catalog/api/serverless.yml)}
 
   s3Bucket:
     Fn::Join: # e.g. s3://stage.hello-retail.biz/
@@ -70,7 +71,6 @@ custom:
   # Stage name for deployment. Use 'prod' to deploy to production.
   stage: ${opt:stage, self:provider.stage, self:custom.private.stage}
 
-  # TODO: Reference values from dependencies above when possible
   webAppBuild:
     configPath: ./config.js
     configValues:
@@ -78,16 +78,15 @@ custom:
       Stage: ${self:custom.stage}
       AWSRegion: ${self:custom.private.region}
       SessionName: ${self:custom.helloRetail.name}-website-${self:custom.stage}
-      # TODO: Create this role as part of this stack
       WebAppRole: arn:aws:iam::${self:custom.private.accountId}:role/${self:custom.stage}HelloRetailWebIdentity
       ProductCatalogTableName:
         Fn::ImportValue: ${self:custom.productCatalogBuilder.custom.exportProductCatalogTableName}
       ProductCategoryTableName:
         Fn::ImportValue: ${self:custom.productCatalogBuilder.custom.exportProductCategoryTableName}
-      CartTableName: #TODO DIDNT WORK
-        Fn::ImportValue: ${self:custom.cartBuilder.custom.exportCartTableName}
       EventWriterApi:
         Fn::ImportValue: ${self:custom.eventWriterApi.custom.exportEventWriterRestApi}
+      ProductCatalogApi:
+        Fn::ImportValue: ${self:custom.productCatalogApi.custom.exportProductCatalogRestApi}
     webpackPath: ./webpack.config.js
 
   webApp: ${self:} # externally, use `${file(~/web/serverless.yml)}`, replacing the `~` therein with the appropriate relative reference [e.g. '..' or '../..']
@@ -96,13 +95,8 @@ custom:
 
 provider:
   name: aws
-  # runtime: nodejs12.x
-  # deploymentBucket: com.${self:custom.private.company}.${self:custom.private.team}.serverless.${self:provider.region}
   profile: ${self:custom.private.profile}
   region: ${self:custom.private.region}
-  environment:
-    AWSSECRETKEY: ${self:custom.private.secretKey}
-    AWSACCESSKEY: ${self:custom.private.accessKey}
 
 resources:
   Conditions:
@@ -154,18 +148,6 @@ resources:
                      - 'dynamodb:Scan'
                    Resource:
                     Fn::ImportValue: ${self:custom.productCatalogBuilder.custom.exportProductCatalogTableCategoryIndexArn}
-          - PolicyName: ReadFromCart
-            PolicyDocument:
-              Version: '2012-10-17'
-              Statement:
-                -  Effect: Allow
-                   Action:
-                     - 'dynamodb:Scan'
-                     - 'dynamodb:GetItem'
-                     - 'dynamodb:BatchGetItem'
-                     - 'dynamodb:Query'
-                   Resource:
-                    Fn::ImportValue: ${self:custom.cartBuilder.custom.exportCartTableArn}
 
     # ===================== S3 =====================
 

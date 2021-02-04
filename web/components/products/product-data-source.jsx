@@ -1,6 +1,6 @@
-import AWS from 'aws-sdk'
 import { Component, PropTypes } from 'react'
 import config from '../../config'
+import * as util from '../util'
 
 class ProductDataSource extends Component {
   static propTypes = {
@@ -18,13 +18,11 @@ class ProductDataSource extends Component {
     super(props)
     this.state = {}
     this.getProductsByCategoryAsync.bind(this)
-    this.getProductsByCategoryFromDynamoAsync.bind(this)
+    this.getProductsByCategoryFromApiAsync.bind(this)
     this.componentDidMount = this.componentDidMount.bind(this)
   }
 
   componentDidMount() {
-    this.dynamo = new AWS.DynamoDB()
-
     if (this.props.category) {
       return this.getProductsByCategoryAsync(this.props.category)
         .then(this.props.productsLoaded)
@@ -36,62 +34,35 @@ class ProductDataSource extends Component {
     }
   }
 
-  getProductByIdFromDynamoAsync(id) {
-    const params = {
-      AttributesToGet: [
-        'brand',
-        'description',
-        'name',
-        'id',
-        'image',
-      ],
-      TableName: config.ProductCatalogTableName,
-      Key: {
-        id: { S: id.toString() },
-      },
-    }
-    return this.dynamo.getItem(params).promise()
+  getProductByIdFromApiAsync(id) {
+    return util.makeApiRequest(config.ProductCatalogApi, 'GET', `/products?id=${encodeURIComponent(id)}`, {})
   }
 
   getProductsByIdAsync(id) {
-    return this.getProductByIdFromDynamoAsync(id)
+    return this.getProductByIdFromApiAsync(id)
       .then((data) => {
         const productList = []
+        let pdata = JSON.parse(data)  //TODO maybe rework
         productList.push({
-          brand: data.Item.brand.S,
-          description: data.Item.description.S,
-          name: data.Item.name.S,
-          id: data.Item.id.S,
-          image: data.Item.image ? data.Item.image.S : null,
+          brand: pdata.Item.brand.S,
+          description: pdata.Item.description.S,
+          name: pdata.Item.name.S,
+          id: pdata.Item.id.S,
+          image: pdata.Item.image ? pdata.Item.image.S : null,
         })
         return productList
       })
   }
 
-  getProductsByCategoryFromDynamoAsync(category) {
-    const params = {
-      ProjectionExpression: '#br, #de, #na, id',
-      TableName: config.ProductCatalogTableName,
-      IndexName: 'Category',
-      KeyConditionExpression: '#ct = :ct',
-      ExpressionAttributeNames: {
-        '#br': 'brand',
-        '#de': 'description',
-        '#na': 'name',
-        '#ct': 'category',
-      },
-      ExpressionAttributeValues: {
-        ':ct': { S: category },
-      },
-    }
-    return this.dynamo.query(params).promise()
+  getProductsByCategoryFromApiAsync(category) {
+    return util.makeApiRequest(config.ProductCatalogApi, 'GET', `/products?category=${encodeURIComponent(category)}`, {})
   }
 
   getProductsByCategoryAsync(category) {
-    return this.getProductsByCategoryFromDynamoAsync(category)
+    return this.getProductsByCategoryFromApiAsync(category)
       .then((data) => {
         const productList = []
-        data.Items.forEach((item) => {
+        JSON.parse(data).Items.forEach((item) => {  //TODO maybe rework
           productList.push({
             brand: item.brand.S,
             description: item.description.S,

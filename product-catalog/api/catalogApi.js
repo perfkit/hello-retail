@@ -96,21 +96,41 @@ const api = {
     if (!ajv.validate(productsRequestSchemaId, event)) { // bad request
       callback(null, impl.clientError(productsRequestSchemaId, ajv.errorsText(), event))
     } else {
-      const params = {
-        TableName: constants.TABLE_PRODUCT_CATALOG_NAME,
-        IndexName: 'Category',
-        ProjectionExpression: '#i, #b, #n, #d',
-        KeyConditionExpression: '#c = :c',
-        ExpressionAttributeNames: {
-          '#i': 'id',
-          '#c': 'category',
-          '#b': 'brand',
-          '#n': 'name',
-          '#d': 'description',
-        },
-        ExpressionAttributeValues: {
-          ':c': event.queryStringParameters.category,
-        },
+      let params
+      if (event.queryStringParameters.id) {
+        params = {
+          TableName: constants.TABLE_PRODUCT_CATALOG_NAME,
+          ProjectionExpression: '#c, #b, #n, #d',
+          KeyConditionExpression: '#i = :i',
+          ExpressionAttributeNames: {
+            '#i': 'id',
+            '#c': 'category',
+            '#b': 'brand',
+            '#n': 'name',
+            '#d': 'description',
+          },
+          ExpressionAttributeValues: {
+            ':i': event.queryStringParameters.id,
+          },
+          Limit: 1,
+        }
+      } else {
+        params = {
+          TableName: constants.TABLE_PRODUCT_CATALOG_NAME,
+          IndexName: 'Category',
+          ProjectionExpression: '#i, #b, #n, #d',
+          KeyConditionExpression: '#c = :c',
+          ExpressionAttributeNames: {
+            '#i': 'id',
+            '#c': 'category',
+            '#b': 'brand',
+            '#n': 'name',
+            '#d': 'description',
+          },
+          ExpressionAttributeValues: {
+            ':c': event.queryStringParameters.category,
+          },
+        }
       }
       dynamo.query(params, (err, data) => {
         if (err) { // error from dynamo

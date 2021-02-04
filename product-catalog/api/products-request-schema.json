@@ -13,11 +13,10 @@
     "queryStringParameters":  {
       "type": "object",
       "properties": {
-        "category":           { "type": "string" }
+        "category":           { "type": "string" },
+		    "id":           	    { "type": "string" }
       },
-      "required": [
-        "category"
-      ],
+      "required": [],
       "additionalProperties": false
     }
   },
