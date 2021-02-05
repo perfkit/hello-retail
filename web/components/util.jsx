@@ -1,5 +1,6 @@
 import config from "../config";
 import https from "https";
+const AWS = require('aws-sdk');
 
 //  makeApiRequest(config.EventWriterApi, 'POST', '/event-writer/', {
 //       schema: 'com.nordstrom/user-info/update-phone/1-0-0',
@@ -22,6 +23,7 @@ exports.makeApiRequest = (api, verb, path, data) => {
     request.host = endpoint.host
     request.body = body
     request.headers.Host = endpoint.host
+    // request.headers['Access-Control-Allow-Origin'] = '*'
 
     const postRequest = https.request(request, (response) => {
       let result = ''
