@@ -16,7 +16,6 @@
         "category":           { "type": "string" },
 		    "id":           	    { "type": "string" }
       },
-      "required": [],
       "additionalProperties": false
     }
   },

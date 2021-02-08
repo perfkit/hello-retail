@@ -100,11 +100,10 @@ const api = {
       if (event.queryStringParameters.id) {
         params = {
           TableName: constants.TABLE_PRODUCT_CATALOG_NAME,
-          ProjectionExpression: '#c, #b, #n, #d',
+          ProjectionExpression: '#i, #b, #n, #d',
           KeyConditionExpression: '#i = :i',
           ExpressionAttributeNames: {
             '#i': 'id',
-            '#c': 'category',
             '#b': 'brand',
             '#n': 'name',
             '#d': 'description',

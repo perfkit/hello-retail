@@ -27,9 +27,9 @@ class CategoryDataSource extends Component {
     return this.getCategoriesFromApiAsync()
       .then((data) => {
         const categoriesList = []
-        JSON.parse(data).Items.forEach((item) => {  //TODO evtl rework
+        JSON.parse(data).forEach((item) => {  //TODO evtl rework
           categoriesList.push({
-            name: item.category.S,
+            name: item.category,
           })
         })
         return categoriesList

@@ -44,11 +44,11 @@ class ProductDataSource extends Component {
         const productList = []
         let pdata = JSON.parse(data)  //TODO maybe rework
         productList.push({
-          brand: pdata.Item.brand.S,
-          description: pdata.Item.description.S,
-          name: pdata.Item.name.S,
-          id: pdata.Item.id.S,
-          image: pdata.Item.image ? pdata.Item.image.S : null,
+          brand: pdata[0].brand,
+          description: pdata[0].description,
+          name: pdata[0].name,
+          id: pdata[0].id,
+          image: pdata[0].image ? pdata[0].image : null,
         })
         return productList
       })
@@ -62,12 +62,12 @@ class ProductDataSource extends Component {
     return this.getProductsByCategoryFromApiAsync(category)
       .then((data) => {
         const productList = []
-        JSON.parse(data).Items.forEach((item) => {  //TODO maybe rework
+        JSON.parse(data).forEach((item) => {  //TODO maybe rework
           productList.push({
-            brand: item.brand.S,
-            description: item.description.S,
-            name: item.name.S,
-            id: item.id.S,
+            brand: item.brand,
+            description: item.description,
+            name: item.name,
+            id: item.id,
           })
         })
         return productList
