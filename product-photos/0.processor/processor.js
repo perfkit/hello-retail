@@ -6,7 +6,6 @@ const KH = require('kinesis-handler')
 /**
  * AJV Schemas
  */
-// TODO Get these from a better place later
 const eventSchema = require('./retail-stream-schema-egress.json')
 const updatePhoneSchema = require('./user-update-phone-schema.json')
 const productCreateSchema = require('./product-create-schema.json')
@@ -17,7 +16,6 @@ const constants = {
   // methods
   METHOD_START_EXECUTION: 'startExecution',
   // values
-  ASSIGNMENTS_PER_REGISTRATION: parseInt(process.env.ASSIGNMENTS_PER_REGISTRATION, 10),
   TTL_DELTA_IN_SECONDS: 60 /* seconds per minute */ * 60 /* minutes per hour */ * 2 /* hours */,
   // resources
   STEP_FUNCTION: process.env.STEP_FUNCTION,
@@ -90,20 +88,17 @@ const impl = {
    */
   registerPhotographer: (event, complete) => {
     const updated = Date.now()
-    const name = impl.eventSource(event.origin).friendlyName
     const putParams = {
       TableName: constants.TABLE_PHOTO_REGISTRATIONS_NAME,
       ConditionExpression: 'attribute_not_exists(id)',
       Item: {
         id: event.data.id,
-        name,
         created: updated,
         createdBy: event.origin,
-        updated,
         updatedBy: event.origin,
-        phone: `+1${event.data.phone}`,
-        lastEvent: event.eventId,
-        registrations: constants.ASSIGNMENTS_PER_REGISTRATION,
+        phone: event.data.phone,
+        lastEvent: 0,
+        registrations: 50,
         assignments: 0,
         timeToLive: Math.ceil(updated / 1000 /* milliseconds per second */) + constants.TTL_DELTA_IN_SECONDS,
       },
@@ -136,15 +131,15 @@ const impl = {
               '#le': 'lastEvent',
               '#re': 'registrations',
               '#as': 'assignments',
-              '#tt': 'timeToLive', // TODO automated setup of TTL for table
+              '#tt': 'timeToLive',
             },
             ExpressionAttributeValues: {
               ':c': updated,
               ':cb': event.origin,
               ':u': updated,
               ':ub': event.origin,
-              ':le': event.eventId, // TODO the right thing (this field is not currently available in event)
-              ':re': constants.ASSIGNMENTS_PER_REGISTRATION,
+              ':le': 0,
+              ':re': 50,
               ':as': 0,
               ':tt': (Math.ceil(updated / 1000 /* milliseconds per second */) + constants.TTL_DELTA_IN_SECONDS).toString(),
             },

@@ -99,14 +99,6 @@ const util = {
     },
     body,
   }),
-  securityRisk: (schemaId, ajvErrors, items) => {
-    console.log(constants.HASHES)
-    console.log(constants.ERROR_SECURITY_RISK)
-    console.log(`${constants.METHOD_TODO} ${constants.ERROR_DATA_CORRUPTION} could not validate data to '${schemaId}' schema. Errors: ${ajvErrors}`)
-    console.log(`${constants.METHOD_TODO} ${constants.ERROR_DATA_CORRUPTION} bad data: ${JSON.stringify(items)}`)
-    console.log(constants.HASHES)
-    return util.response(500, constants.ERROR_SERVER)
-  },
   decrypt: (field, value) => kms.decrypt({ CiphertextBlob: new Buffer(value, 'base64') }).promise().then(
     data => BbPromise.resolve(data.Plaintext.toString('ascii')),
     err => BbPromise.reject(new ServerError(`Error decrypting '${field}': ${err}`)) // eslint-disable-line comma-dangle
@@ -116,10 +108,10 @@ const util = {
 /**
  * Implementation (Internal)
  */
-const impl = { 
+const impl = {
   /**
    * Validate the request.
-   * @param event The event representing the HTTPS request
+   * @param event The event representing the HTTPS POST request
    */
   validateRequest: (event) => {
     const body = url.parse(`?${event.body}`, true).query
