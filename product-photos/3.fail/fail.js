@@ -6,7 +6,7 @@ const dynamo = new aws.DynamoDB.DocumentClient()
 
 const constants = {
   // self
-  MODULE: 'product-photos/4.fail/fail.js',
+  MODULE: 'product-photos/3.fail/fail.js',
   METHOD_UPDATE_ASSIGNMENT: 'updateAssignment',
   METHOD_HANDLER: 'handler',
   // External Values

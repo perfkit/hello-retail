@@ -8,7 +8,7 @@ const aws = require('aws-sdk') // eslint-disable-line import/no-unresolved, impo
  */
 const constants = {
   // self
-  MODULE: 'product-photos/6.report/report.js',
+  MODULE: 'product-photos/4.report/report.js',
   METHOD_: '',
   METHOD_WRITE_TO_STREAM: 'writeToStream',
   METHOD_SUCCEED_ASSIGNMENT: 'succeedAssignment',

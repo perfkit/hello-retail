@@ -20,6 +20,9 @@ functions:
       'Fn::GetAtt': [ AssignRole, Arn ]
     handler: assign.handler
     environment:
+      ACTIVITY_RECEIVE_ARN: ${self:custom.productPhotos.receiveActivityArn}
+      TABLE_PHOTO_ASSIGNMENTS_NAME:
+        Fn::ImportValue: ${self:custom.productPhotos.exportPhotoAssignmentsTableName}
       TABLE_PHOTO_REGISTRATIONS_NAME:
         Fn::ImportValue: ${self:custom.productPhotos.exportPhotoRegistrationsTableName}
 
@@ -64,6 +67,16 @@ resources:
                       - ':'
                       - - 'Fn::GetAtt': [ AssignLogGroup, Arn ]
                         - '*'
+          - PolicyName: GetAndFailActivityTask
+              PolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                  - Effect: Allow
+                    Action:
+                      - 'states:GetActivityTask'
+                      - 'states:SendTaskFailure'
+                    Resource: ${self:custom.productPhotos.receiveActivityArn}
+          - ${self:custom.productPhotos.updatePhotoAssignment}
           - ${self:custom.productPhotos.queryPhotoRegistrationsAssignmentsIndex}
           - ${self:custom.productPhotos.updatePhotoRegistrations}
   Outputs:
