@@ -80,26 +80,18 @@ const impl = {
       Key: {
         id: event.photographer.id,
       },
-      ConditionExpression: '#aa=:aa',
       UpdateExpression: [
         'set',
         '#u=:u,',
         '#ub=:ub,',
-        '#as=#as+:as',
-        'remove',
-        '#aa',
       ].join(' '),
       ExpressionAttributeNames: {
         '#u': 'updated',
         '#ub': 'updatedBy',
-        '#as': 'assignments',
-        '#aa': 'assignment',
       },
       ExpressionAttributeValues: {
         ':u': updated,
         ':ub': event.origin,
-        ':as': 1,
-        ':aa': event.data.id.toString(),
       },
       ReturnValues: 'NONE',
       ReturnConsumedCapacity: 'NONE',

@@ -4,16 +4,13 @@ const AJV = require('ajv')
 const aws = require('aws-sdk') // eslint-disable-line import/no-unresolved, import/no-extraneous-dependencies
 const BbPromise = require('bluebird')
 const got = require('got')
-const url = require('url')
 
 /**
  * AJV
  */
-// TODO Get these from a better place later
 const photoInputSchema = require('./photo-input-schema.json')
 const photoAssignmentSchema = require('./photo-assignment-schema.json')
 
-// TODO generalize this?  it is used by but not specific to this module
 const makeSchemaId = schema => `${schema.self.vendor}/${schema.self.name}/${schema.self.version}`
 
 const photoInputSchemaId = makeSchemaId(photoInputSchema)
@@ -29,7 +26,6 @@ ajv.addSchema(photoAssignmentSchema, photoAssignmentSchemaId)
  */
 aws.config.setPromisesDependency(BbPromise)
 const dynamo = new aws.DynamoDB.DocumentClient()
-const kms = new aws.KMS()
 const s3 = new aws.S3()
 const stepfunctions = new aws.StepFunctions()
 
@@ -49,7 +45,6 @@ const constants = {
   // Locations
   MODULE: 'receive.js',
   METHOD_HANDLER: 'handler',
-  METHOD_DECRYPT: 'util.decrypt',
   METHOD_PLACE_IMAGE_IN_S3: 'impl.storeImage',
   METHOD_SEND_STEP_SUCCESS: 'impl.sendStepSuccess',
 
@@ -99,10 +94,6 @@ const util = {
     },
     body,
   }),
-  decrypt: (field, value) => kms.decrypt({ CiphertextBlob: new Buffer(value, 'base64') }).promise().then(
-    data => BbPromise.resolve(data.Plaintext.toString('ascii')),
-    err => BbPromise.reject(new ServerError(`Error decrypting '${field}': ${err}`)) // eslint-disable-line comma-dangle
-  ),
 }
 
 /**
@@ -112,17 +103,20 @@ const impl = {
   /**
    * Validate the request.
    * @param event The event representing the HTTPS POST request
+   * {
+   *   From: 'PHOTOGRAPH PHONE NUMBER'
+   *   For:  'ITEM ID'
+   *   MediaURL: http://www.example.org/image.jpg
+   * }
    */
   validateRequest: (event) => {
-    const body = url.parse(`?${event.body}`, true).query
-    if (body.NumMedia < 1) {
-      return BbPromise.reject(new UserError('Oops!  We were expecting a product image.  Please send one!  :D'))
-    } else if (body.NumMedia > 1) {
-      return BbPromise.reject(new UserError('Oops!  We can only handle one image.  Sorry... can you please try again?  :D'))
-    } else if (!body.MediaContentType0 || !body.MediaContentType0.startsWith('image/')) {
-      return BbPromise.reject(new UserError('Oops!  We can only accept standard images.  We weren\'t very creative...'))
+    const body = JSON.parse(event.body)
+    if (!body.For) {
+      return BbPromise.reject(new UserError('Request did not contain the Item ID the photo is for'))
     } else if (!body.From) {
-      return BbPromise.reject(new ServerError('Request did not contain the phone number/ user ID the image came from.'))
+      return BbPromise.reject(new ServerError('Request did not contain the phone number the image came from.'))
+    } else if (!body.MediaUrl) {
+      return BbPromise.reject(new ServerError('Request did not contain the image URL.'))
     } else {
       return BbPromise.resolve({
         event,
@@ -139,15 +133,11 @@ const impl = {
    * @param results The event representing the HTTPS request
    */
   getImage: (results) => {
-    const uri = url.parse(results.body.MediaUrl0)
-    if (aws.config.httpOptions.agent) {
-      uri.agent = aws.config.httpOptions.agent
-    }
-    return got.get(uri, { encoding: null }).then(
+    return got(results.body.MediaUrl).then(
       res => BbPromise.resolve({
-        contentType: results.body.MediaContentType0,
+        contentType: /image/,
         data: res.body,
-      }) // eslint-disable-line comma-dangle
+      })
     )
   },
   /**
@@ -157,7 +147,7 @@ const impl = {
   getAssignment: (results) => {
     const params = {
       Key: {
-        number: results.body.From,
+        number: results.body.For,
       },
       TableName: constants.TABLE_PHOTO_ASSIGNMENTS_NAME,
       AttributesToGet: [
@@ -232,7 +222,7 @@ const impl = {
     return error.message
   },
   thankYouForImage: (taskEvent) => {
-    return `Thanks so much ${taskEvent.photographer.name}!`
+    return `Thanks so much ${taskEvent.photographer.id}!`
   },
 }
 /**

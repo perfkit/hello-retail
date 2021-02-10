@@ -33,7 +33,7 @@ const impl = {
     const dbParams = {
       TableName: constants.TABLE_PHOTO_ASSIGNMENTS_NAME,
       Key: {
-        number: event.photographer.phone,
+        number: event.data.id,  // save assignment related to item, not photographer!
       },
       UpdateExpression: [
         'set',

@@ -42,7 +42,7 @@ const impl = {
     const params = {
       TableName: constants.TABLE_PHOTO_ASSIGNMENTS_NAME,
       Key: {
-        number: event.photographer.phone,
+        number: event.data.id,
       },
       ConditionExpression: 'attribute_exists(#nu)',
       ExpressionAttributeNames: {

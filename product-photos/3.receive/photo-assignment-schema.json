@@ -18,8 +18,8 @@
       "type": "object",
       "properties": {
         "From":               { "type": "string", "pattern": "^\\+?[1-9]\\d{1,14}$" },
-        "NumMedia":           { "type": "string", "pattern": "^\\d+$" },
-        "MediaUrl0":          { "type": "string", "format": "url" },
+        "For":                { "type": "string", "pattern": "^\\d+$" },
+        "MediaUrl":           { "type": "string", "format": "url" },
         "Body":               { "type": "string" }
       },
       "additionalProperties": true

@@ -97,9 +97,6 @@ const impl = {
         createdBy: event.origin,
         updatedBy: event.origin,
         phone: event.data.phone,
-        lastEvent: 0,
-        registrations: 50,
-        assignments: 0,
         timeToLive: Math.ceil(updated / 1000 /* milliseconds per second */) + constants.TTL_DELTA_IN_SECONDS,
       },
     }
@@ -109,18 +106,14 @@ const impl = {
           const updateParams = {
             TableName: constants.TABLE_PHOTO_REGISTRATIONS_NAME,
             Key: {
-              id: event.data.id, // TODO the right thing?
+              id: event.data.id,
             },
-            ConditionExpression: '#le<:le', // update if this event has not yet caused an update
             UpdateExpression: [
               'set',
               '#c=if_not_exists(#c,:c),',
               '#cb=if_not_exists(#cb,:cb),',
               '#u=:u,',
               '#ub=:ub,',
-              '#le=:le,',
-              '#re=#re+:re,',
-              '#as=if_not_exists(#as,:as),',
               '#tt=:tt',
             ].join(' '),
             ExpressionAttributeNames: {
@@ -128,9 +121,6 @@ const impl = {
               '#cb': 'createdBy',
               '#u': 'updated',
               '#ub': 'updatedBy',
-              '#le': 'lastEvent',
-              '#re': 'registrations',
-              '#as': 'assignments',
               '#tt': 'timeToLive',
             },
             ExpressionAttributeValues: {
@@ -138,9 +128,6 @@ const impl = {
               ':cb': event.origin,
               ':u': updated,
               ':ub': event.origin,
-              ':le': 0,
-              ':re': 50,
-              ':as': 0,
               ':tt': (Math.ceil(updated / 1000 /* milliseconds per second */) + constants.TTL_DELTA_IN_SECONDS).toString(),
             },
             ReturnValues: 'NONE',
