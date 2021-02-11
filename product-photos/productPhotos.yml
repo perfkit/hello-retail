@@ -21,14 +21,6 @@ assignName: ${self:custom.productPhotos.name}-assign
 exportPhotoAssignmentsAssignLambdaName: ${self:custom.productPhotos.assignName}:${self:custom.stage}:PhotoAssignmentsAssignLambdaName:${self:custom.productPhotos.productPhotosVersion}
 exportPhotoAssignmentsAssignLambdaArn: ${self:custom.productPhotos.assignName}:${self:custom.stage}:PhotoAssignmentsAssignLambdaArn:${self:custom.productPhotos.productPhotosVersion}
 
-messageName: ${self:custom.productPhotos.name}-message
-exportPhotoAssignmentsMessageLambdaName: ${self:custom.productPhotos.messageName}:${self:custom.stage}:PhotoAssignmentsMessageLambdaName:${self:custom.productPhotos.productPhotosVersion}
-exportPhotoAssignmentsMessageLambdaArn: ${self:custom.productPhotos.messageName}:${self:custom.stage}:PhotoAssignmentsMessageLambdaArn:${self:custom.productPhotos.productPhotosVersion}
-
-recordName: ${self:custom.productPhotos.name}-record
-exportPhotoAssignmentsRecordLambdaName: ${self:custom.productPhotos.recordName}:${self:custom.stage}:PhotoAssignmentsRecordLambdaName:${self:custom.productPhotos.productPhotosVersion}
-exportPhotoAssignmentsRecordLambdaArn: ${self:custom.productPhotos.recordName}:${self:custom.stage}:PhotoAssignmentsRecordLambdaArn:${self:custom.productPhotos.productPhotosVersion}
-
 receiveName: ${self:custom.productPhotos.name}-receive
 exportPhotoAssignmentsReceiveLambdaName: ${self:custom.productPhotos.receiveName}:${self:custom.stage}:PhotoAssignmentsReceiveLambdaName:${self:custom.productPhotos.productPhotosVersion}
 exportPhotoAssignmentsReceiveLambdaArn: ${self:custom.productPhotos.receiveName}:${self:custom.stage}:PhotoAssignmentsReceiveLambdaArn:${self:custom.productPhotos.productPhotosVersion}
@@ -40,10 +32,6 @@ exportPhotoAssignmentsFailLambdaArn: ${self:custom.productPhotos.failName}:${sel
 successName: ${self:custom.productPhotos.name}-success
 exportPhotoAssignmentsSuccessLambdaName: ${self:custom.productPhotos.successName}:${self:custom.stage}:PhotoAssignmentsSuccessLambdaName:${self:custom.productPhotos.productPhotosVersion}
 exportPhotoAssignmentsSuccessLambdaArn: ${self:custom.productPhotos.successName}:${self:custom.stage}:PhotoAssignmentsSuccessLambdaArn:${self:custom.productPhotos.productPhotosVersion}
-
-unmessageName: ${self:custom.productPhotos.name}-unmessage
-exportPhotoAssignmentsUnmessageLambdaName: ${self:custom.productPhotos.unmessageName}:${self:custom.stage}:PhotoAssignmentsUnmessageLambdaName:${self:custom.productPhotos.productPhotosVersion}
-exportPhotoAssignmentsUnmessageLambdaArn: ${self:custom.productPhotos.unmessageName}:${self:custom.stage}:PhotoAssignmentsUnmessageLambdaArn:${self:custom.productPhotos.productPhotosVersion}
 
 reportName: ${self:custom.productPhotos.name}-report
 exportPhotoAssignmentsReportLambdaName: ${self:custom.productPhotos.reportName}:${self:custom.stage}:PhotoAssignmentsReportLambdaName:${self:custom.productPhotos.productPhotosVersion}

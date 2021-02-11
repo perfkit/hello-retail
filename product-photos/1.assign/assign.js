@@ -74,8 +74,10 @@ const impl = {
     }
     dynamo.update(dbParams, (err) => {
       if (err) {
+        console.log(`${constants.MODULE} ${constants.METHOD_PUT_ASSIGNMENT} - error updating DynamoDb: ${err}`)
         callback(`${constants.MODULE} ${constants.METHOD_PUT_ASSIGNMENT} - error updating DynamoDb: ${err}`)
       } else { // second update result if error was not previously seen
+        console.log('DynamoDB updated successfully!')
         callback()
       }
     })

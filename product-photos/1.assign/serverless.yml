@@ -68,14 +68,14 @@ resources:
                       - - 'Fn::GetAtt': [ AssignLogGroup, Arn ]
                         - '*'
           - PolicyName: GetAndFailActivityTask
-              PolicyDocument:
-                Version: '2012-10-17'
-                Statement:
-                  - Effect: Allow
-                    Action:
-                      - 'states:GetActivityTask'
-                      - 'states:SendTaskFailure'
-                    Resource: ${self:custom.productPhotos.receiveActivityArn}
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'states:GetActivityTask'
+                    - 'states:SendTaskFailure'
+                  Resource: ${self:custom.productPhotos.receiveActivityArn}
           - ${self:custom.productPhotos.updatePhotoAssignment}
           - ${self:custom.productPhotos.queryPhotoRegistrationsAssignmentsIndex}
           - ${self:custom.productPhotos.updatePhotoRegistrations}
