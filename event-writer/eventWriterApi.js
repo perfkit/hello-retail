@@ -90,6 +90,7 @@ const impl = {
 
         kinesis.putRecord(newEvent, (err, data) => {
           if (err) {
+            console.log(`kinesis putRecord error: ${err}`)
             callback(null, impl.kinesisError(eventData.schema, err))
           } else {
             callback(null, impl.success(data))

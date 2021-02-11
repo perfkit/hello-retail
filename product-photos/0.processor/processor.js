@@ -136,6 +136,7 @@ const impl = {
           }
           dynamo.update(updateParams, complete)
         } else {
+          console.log(`registerPhotographer error: ${err}`)
           complete(err)
         }
       } else {
@@ -175,6 +176,7 @@ const impl = {
         if (err.code && err.code === 'ExecutionAlreadyExists') {
           complete()
         } else {
+          console.log(`startExecution error: ${err}`)
           complete(err)
         }
       } else {

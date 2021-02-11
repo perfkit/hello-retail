@@ -37,6 +37,9 @@ export REGION=<AWS_REGION> 	# e.g., us-east-1
 export STAGE=<STAGE>		# e.g., prod
 export AWS_PROFILE=<PROFILE_NAME>
 
+# Install dependencies
+npm run root:install:all
+
 # Deploy the whole system
 npm run root:deploy:all
 

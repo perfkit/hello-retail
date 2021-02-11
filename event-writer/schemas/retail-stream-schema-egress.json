@@ -9,7 +9,7 @@
   "type": "object",
   "allOf": { "$ref": "retail-stream-schema-ingress.json#" },
   "properties": {
-    "eventId": { "type": "string", "format": "" },
+    "eventId": { "type": "string" },
     "timeIngest":  { "type": "string", "format": "date-time" },
     "timeProcess": { "type": "string", "format": "date-time" }
   },
