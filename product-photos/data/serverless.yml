@@ -32,8 +32,8 @@ resources:
           - AttributeName: id
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
         TableName: ${self:custom.stage}-${self:service}-PhotoRegistrations-${self:custom.productPhotos.productPhotosVersion}
         GlobalSecondaryIndexes:
           - IndexName: Assignments
@@ -43,8 +43,8 @@ resources:
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 3
-              WriteCapacityUnits: 3
+              ReadCapacityUnits: 10
+              WriteCapacityUnits: 10
     # A DynamoDB table for recording the relationships between photographers and the StepFunctions executions that
     # have requested that they take a photograph.  Although only the phone number is the hash key, the table will be
     # filled with the 'taskToken', 'taskEvent', and assignment 'status' associated with a StepFunction's execution's
@@ -54,14 +54,14 @@ resources:
       Type: 'AWS::DynamoDB::Table'
       Properties:
         AttributeDefinitions:
-          - AttributeName: number
-            AttributeType: S
+          - AttributeName: id
+            AttributeType: N
         KeySchema:
-          - AttributeName: number
+          - AttributeName: id
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
         TableName: ${self:custom.stage}-${self:service}-PhotoAssignments-${self:custom.productPhotos.productPhotosVersion}
   Outputs:
     # Registrations

@@ -36,7 +36,7 @@ class PhotographerRegisterPage extends Component {
       schema: 'com.nordstrom/user-info/update-phone/1-0-0',
       id: id,
       phone: phoneNumber,
-      origin: `hello-retail/web-client-create-product/dummy_id/dummy_name`,
+      origin: `hello-retail/web-client-register-photographer/dummy_id/dummy_name`,
     })
     .then(() => {
       this.setState({

@@ -19,7 +19,7 @@
       "properties": {
         "From":               { "type": "string", "pattern": "^\\+?[1-9]\\d{1,14}$" },
         "For":                { "type": "string", "pattern": "^\\d+$" },
-        "MediaUrl":           { "type": "string", "format": "url" },
+        "MediaUrl":           { "type": "string" },
         "Body":               { "type": "string" }
       },
       "additionalProperties": true

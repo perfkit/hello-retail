@@ -23,6 +23,7 @@ const impl = {
     const params = {
       activityArn: constants.RECEIVE_ACTIVITY_ARN,
     }
+    console.log('Get Activity Task from stepfunctions.')
     stepfunctions.getActivityTask(params, callback)
   },
   failTask: (event, task, putErr, callback) => {
@@ -38,7 +39,7 @@ const impl = {
     const dbParams = {
       TableName: constants.TABLE_PHOTO_ASSIGNMENTS_NAME,
       Key: {
-        number: event.data.id,  // save assignment related to item, not photographer!
+        id: event.data.id,  // save assignment related to item, not photographer!
       },
       UpdateExpression: [
         'set',
@@ -72,6 +73,7 @@ const impl = {
       ReturnConsumedCapacity: 'NONE',
       ReturnItemCollectionMetrics: 'NONE',
     }
+    console.log('Started Updating DynamoDB.')
     dynamo.update(dbParams, (err) => {
       if (err) {
         console.log(`${constants.MODULE} ${constants.METHOD_PUT_ASSIGNMENT} - error updating DynamoDb: ${err}`)

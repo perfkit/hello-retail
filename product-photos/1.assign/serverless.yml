@@ -13,6 +13,7 @@ provider:
   runtime: nodejs12.x
   profile: ${self:custom.private.profile}
   region: ${self:custom.private.region}
+  timeout: 10
 
 functions:
   assign:
