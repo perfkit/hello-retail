@@ -147,7 +147,7 @@ const impl = {
   getAssignment: (results) => {
     const params = {
       Key: {
-        number: results.body.For,
+        id: results.body.For,
       },
       TableName: constants.TABLE_PHOTO_ASSIGNMENTS_NAME,
       AttributesToGet: [
