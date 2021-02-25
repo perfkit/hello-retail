@@ -79,9 +79,9 @@ def commitPhoto(pr_url, phone_number, item_id, image_url):
 # SB calls
 
 def prepare(spec):
-    log = spec.run(f"./deploy.sh {spec['region']}", image='serverless_cli')  # TODO: region setting in sh file
+    log = spec.run(f"./deploy.sh {spec['region']}", image='serverless_cli')  # TODO: region setting in deploy.sh file
     
-    # TODO: echo api urls in sh file
+    # TODO: echo api urls in deploy.sh file
     spec['endpoint_event_writer_api'] = re.sub("\\s+", "", log[log.rindex("https"):])
     spec['endpoint_product_catalog_api'] = re.sub("\\s+", "", log[log.rindex("https"):])
     spec['endpoint_photo_receive_api'] = re.sub("\\s+", "", log[log.rindex("https"):])
@@ -101,4 +101,4 @@ def invoke(spec):
 
 
 def cleanup(spec):
-    spec.run(f"./remove.sh {spec['region']}", image='serverless_cli')   # TODO: region setting in sh file
+    spec.run(f"./remove.sh {spec['region']}", image='serverless_cli')   # TODO: region setting in remove.sh file

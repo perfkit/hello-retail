@@ -25,7 +25,6 @@ const impl = {
     }
     console.log('Get Activity Task from stepfunctions.')
     stepfunctions.getActivityTask(params, callback)   // This can take up to 60 seconds! https://docs.aws.amazon.com/step-functions/latest/apireference/API_GetActivityTask.html
-    console.log('Received Activity Task from stepfunctions.')
   },
   failTask: (event, task, putErr, callback) => {
     const params = {
