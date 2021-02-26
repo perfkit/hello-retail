@@ -1,6 +1,6 @@
 # State Machine (AWS StepFunction for Acquiring an Image from a registered Photographer)
 Comment: Aquire a photograph of the given product from one of the registered photographers
-StartAt: AssignPhotographer
+StartAt: WaitForPhoto
 States:
   WaitForPhoto:
     Type: Parallel
