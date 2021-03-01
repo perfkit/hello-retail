@@ -48,7 +48,7 @@ const kinesis = new aws.Kinesis()
  */
 const impl = {
   writeToStream: (lambdaEvent, callback) => {
-    const origin = `product-photos/Photographer/${lambdaEvent.photographer.phone}/${lambdaEvent.photographer.name}`
+    const origin = `product-photos/Photographer/${lambdaEvent.photographer.phone}/${lambdaEvent.photographer.id}`
     const productId = lambdaEvent.data.id.toString()
     const imageEvent = {
       schema: eventSchemaId,
@@ -103,11 +103,11 @@ const impl = {
     const params = {
       TableName: constants.TABLE_PHOTO_ASSIGNMENTS_NAME,
       Key: {
-        number: event.photographer.phone,
+        id: event.data.id,
       },
-      ConditionExpression: 'attribute_exists(#nu)',
+      ConditionExpression: 'attribute_exists(#i)',
       ExpressionAttributeNames: {
-        '#nu': 'number', // status
+        '#i': 'id', // status
       },
     }
     dynamo.delete(params, (err) => {

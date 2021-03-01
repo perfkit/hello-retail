@@ -42,11 +42,11 @@ const impl = {
     const params = {
       TableName: constants.TABLE_PHOTO_ASSIGNMENTS_NAME,
       Key: {
-        number: event.data.id,
+        id: event.data.id,
       },
-      ConditionExpression: 'attribute_exists(#nu)',
+      ConditionExpression: 'attribute_exists(#i)',
       ExpressionAttributeNames: {
-        '#nu': 'number', // status
+        '#i': 'id',
       },
     }
     dynamo.delete(params, (err) => {

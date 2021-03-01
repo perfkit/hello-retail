@@ -104,16 +104,21 @@ const impl = {
    * Validate the request.
    * @param event The event representing the HTTPS POST request
    * {
-   *   From: 'PHOTOGRAPH PHONE NUMBER'
-   *   For:  'ITEM ID'
-   *   MediaURL: http://www.example.org/image.jpg
+   *   photographer: {
+   *     id: 'PHOTOGRAPHER ID',
+   *     phone: 'PHONE NUMBER'
+   *   },
+   *   For:  'ITEM ID',
+   *   MediaURL: 'http://www.example.org/image.jpg'
    * }
    */
   validateRequest: (event) => {
     const body = JSON.parse(event.body)
     if (!body.For) {
       return BbPromise.reject(new UserError('Request did not contain the Item ID the photo is for'))
-    } else if (!body.From) {
+    } else if (!body.photographer.id) {
+      return BbPromise.reject(new ServerError('Request did not contain the photographer id the image came from.'))
+    } else if (!body.photographer.phone) {
       return BbPromise.reject(new ServerError('Request did not contain the phone number the image came from.'))
     } else if (!body.MediaUrl) {
       return BbPromise.reject(new ServerError('Request did not contain the image URL.'))
@@ -165,6 +170,7 @@ const impl = {
           } else {
             const item = data.Item
             item.taskEvent = JSON.parse(item.taskEvent)
+            item.taskEvent.photographer = results.body.photographer
             return BbPromise.resolve(item)
           }
         },

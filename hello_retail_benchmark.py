@@ -29,7 +29,7 @@ def registerPhotographer(ew_url, id, phone_number):
 def newProduct(ew_url, prod_id, prod_category, prod_name, prod_brand, prod_desc):
     data = {
       'schema': 'com.nordstrom/product/create/1-0-0',
-      'id': prod_id             # (`0000000${Math.floor(Math.abs(Math.random() * 10000000))}`).substr(-7) --> random 7-digit number
+      'id': prod_id,            # (`0000000${Math.floor(Math.abs(Math.random() * 10000000))}`).substr(-7) --> random 7-digit number
       'origin': 'hello-retail/sb-create-product/dummy_id/dummy_name',
       'category': prod_category.strip(),
       'name': prod_name.strip(),
@@ -63,10 +63,13 @@ def listProductsByID(pc_url, id):
     else:
         raise Exception(f"Error code {resp.status_code}: {resp.content}")
 
-def commitPhoto(pr_url, phone_number, item_id, image_url):
+def commitPhoto(pr_url, pg_id, phone_number, item_id, image_url):
     data = {
-      'From': phone_number
-      'For': item_id
+      'photographer': {
+        'id': pg_id,
+        'phone': phone_number
+      },
+      'For': item_id,
       'MediaURL': image_url     # http://www.example.org/image.jpg
     }
     resp = requests.post(url=pr_url + "/sms", json=data)
@@ -92,12 +95,12 @@ def prepare(spec):
     
 
 def invoke(spec):
-    print(registerPhotographer(spec['endpoint_event_writer_api'], "photographer1", 1234567891))
-    print(newProduct(spec['endpoint_event_writer_api'], 1234567, "category1", "name1", "brand1", "description1"))
+    print(registerPhotographer(spec['endpoint_event_writer_api'], "photographer1", "1234567891"))
+    print(newProduct(spec['endpoint_event_writer_api'], "1234567", "category1", "name1", "brand1", "description1"))
     print(listCategories(spec['endpoint_product_catalog_api']))
     print(listProductsByCategory(spec['endpoint_product_catalog_api'], "category1"))
-    print(listProductsByID(spec['endpoint_product_catalog_api'], 1234567))
-    print(commitPhoto(spec['endpoint_photo_receive_api'], 1234567891, 1234567, "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"))
+    print(listProductsByID(spec['endpoint_product_catalog_api'], "1234567"))
+    print(commitPhoto(spec['endpoint_photo_receive_api'], "photographer1", "1234567891", "1234567", "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"))
 
 
 def cleanup(spec):
