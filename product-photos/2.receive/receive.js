@@ -140,7 +140,7 @@ const impl = {
   getImage: (results) => {
     return got(results.body.MediaUrl).then(
       res => BbPromise.resolve({
-        contentType: /image/,
+        contentType: 'image/jpeg',
         data: res.body,
       })
     )
