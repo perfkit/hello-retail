@@ -88,6 +88,7 @@ def commitPhoto(pr_url, pg_id, phone_number, item_id, image_url):
 # SB calls
 
 def prepare(spec):
+  # set private.yml region to specified region! default: us-east-1
   log = spec.run(f"./deploy.sh {spec['region']}", image='serverless_cli')
 
   urls = re.findall(r"^.*https://.*execute-api.*$", log)

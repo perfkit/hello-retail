@@ -79,7 +79,7 @@ States:
             Type: Succeed
     Next: ExtractResult
   ExtractResult:
-    InputPath: '$.[0]'
+    InputPath: '$.[1]'
     Type: 'Pass'
     Next: CompleteAssignment
   CompleteAssignment:
