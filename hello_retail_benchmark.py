@@ -1,3 +1,4 @@
+import base64
 import logging
 import re
 
@@ -69,14 +70,14 @@ def listProductsByID(pc_url, product_id):
     raise Exception(f"Error code {resp.status_code}: {resp.content}")
 
 
-def commitPhoto(pr_url, pg_id, phone_number, item_id, image_url):
+def commitPhoto(pr_url, pg_id, phone_number, item_id, image):
   data = {
     'photographer': {
       'id': pg_id,
       'phone': phone_number
     },
     'For': item_id,
-    'MediaUrl': image_url  # http://www.example.org/image.jpg
+    'Media': image  # base64 encoded file
   }
   resp = requests.post(url=pr_url + "/sms", json=data)
   if resp.status_code == 200:
@@ -85,29 +86,39 @@ def commitPhoto(pr_url, pg_id, phone_number, item_id, image_url):
     raise Exception(f"Error code {resp.status_code}: {resp.content}")
 
 
+# Util
+
+def encondeImage(filepath):
+  image = open(filepath, 'rb')  # open binary file in read mode
+  image_read = image.read()
+  image_64_encode = base64.encodebytes(image_read)
+  return image_64_encode
+
+
 # SB calls
 
 def prepare(spec):
   # set private.yml region to specified region! default: us-east-1
+  # sb login with: sb login aws --profile=<YOUR_AWS_PROFILE_NAME>
   log = spec.run(f"./deploy.sh {spec['region']}", image='serverless_cli')
 
-  urls = re.findall(r"^.*https://.*execute-api.*$", log)
+  urls = re.findall(r" [-] https://[-\w.]+execute-api[-\w.]+/\w+/[\w-]+", log)
   for url in urls:
-    m = re.match(r".*POST - (https://[-\w.]+/\w+)/event-writer", url)
+    m = re.match(r" - (https://[-\w.]+/\w+)/event-writer", url)
     if m:
       spec['endpoint_event_writer_api'] = m.group(1)
     else:
-      m = re.match(r".*GET - (https://[-\w.]+/\w+)/categories", url)
+      m = re.match(r" - (https://[-\w.]+/\w+)/categories", url)
       if m:
         spec['endpoint_product_catalog_api'] = m.group(1)
       else:
-        m = re.match(r".*POST - (https://[-\w.]+/\w+)/sms", url)
+        m = re.match(r" - (https://[-\w.]+/\w+)/sms", url)
         if m:
           spec['endpoint_photo_receive_api'] = m.group(1)
 
-  logging.info(f"endpoint event writer={spec['endpoint']}")
-  logging.info(f"endpoint product catalog={spec['endpoint']}")
-  logging.info(f"endpoint photo receive={spec['endpoint']}")
+  logging.info(f"endpoint event writer={spec['endpoint_event_writer_api']}")
+  logging.info(f"endpoint product catalog={spec['endpoint_product_catalog_api']}")
+  logging.info(f"endpoint photo receive={spec['endpoint_photo_receive_api']}")
 
 
 def invokeAPI(response):
@@ -120,7 +131,8 @@ def invoke(spec):
   invokeAPI(listCategories(spec['endpoint_product_catalog_api']))
   invokeAPI(listProductsByCategory(spec['endpoint_product_catalog_api'], "category1"))
   invokeAPI(listProductsByID(spec['endpoint_product_catalog_api'], "1234567"))
-  invokeAPI(commitPhoto(spec['endpoint_photo_receive_api'], "photographer1", "1234567891", "1234567", "https://cdn.vox-cdn.com/thumbor/th5YNVqlkHqkz03Va5RPOXZQRhA=/0x0:2040x1360/1200x800/filters:focal(857x517:1183x843)/cdn.vox-cdn.com/uploads/chorus_image/image/57358643/jbareham_170504_1691_0020.0.0.jpg"))
+  invokeAPI(commitPhoto(spec['endpoint_photo_receive_api'], "photographer1", "1234567891", "1234567",
+                        encondeImage("benchmark_images/snowdrop.jpg")))
 
 
 def cleanup(spec):

@@ -4,6 +4,7 @@ const AJV = require('ajv')
 const aws = require('aws-sdk') // eslint-disable-line import/no-unresolved, import/no-extraneous-dependencies
 const BbPromise = require('bluebird')
 const got = require('got')
+const https = require('https')
 
 /**
  * AJV
@@ -109,7 +110,7 @@ const impl = {
    *     phone: 'PHONE NUMBER'
    *   },
    *   For:  'ITEM ID',
-   *   MediaURL: 'http://www.example.org/image.jpg'
+   *   Media: '...' base64 encoded jpeg image
    * }
    */
   validateRequest: (event) => {
@@ -120,8 +121,8 @@ const impl = {
       return BbPromise.reject(new ServerError('Request did not contain the photographer id the image came from.'))
     } else if (!body.photographer.phone) {
       return BbPromise.reject(new ServerError('Request did not contain the phone number the image came from.'))
-    } else if (!body.MediaUrl) {
-      return BbPromise.reject(new ServerError('Request did not contain the image URL.'))
+    } else if (!body.Media) {
+      return BbPromise.reject(new ServerError('Request did not contain the image.'))
     } else {
       return BbPromise.resolve({
         event,
@@ -138,12 +139,11 @@ const impl = {
    * @param results The event representing the HTTPS request
    */
   getImage: (results) => {
-    return got(results.body.MediaUrl).then(
-      res => BbPromise.resolve({
+    return BbPromise.resolve({
         contentType: 'image/jpeg',
-        data: res.body,
+        contentEncoding : 'base64',
+        data: results.body.Media,
       })
-    )
   },
   /**
    * Obtain the assignment associated with the number/ID that this message/image is being received from.
@@ -195,6 +195,7 @@ const impl = {
       Key: bucketKey,
       Body: image.data,
       ContentType: image.contentType,
+      ContentEncoding : image.contentEncoding,
       Metadata: {
         from: assignment.taskEvent.photographer.phone,
       },

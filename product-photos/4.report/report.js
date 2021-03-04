@@ -11,12 +11,10 @@ const constants = {
   MODULE: 'product-photos/4.report/report.js',
   METHOD_: '',
   METHOD_WRITE_TO_STREAM: 'writeToStream',
-  METHOD_SUCCEED_ASSIGNMENT: 'succeedAssignment',
   METHOD_DELETE_ASSIGNMENT: 'deleteAssignment',
   // external
   RETAIL_STREAM_NAME: process.env.RETAIL_STREAM_NAME,
   RETAIL_STREAM_WRITER_ARN: process.env.RETAIL_STREAM_WRITER_ARN,
-  TABLE_PHOTO_REGISTRATIONS_NAME: process.env.TABLE_PHOTO_REGISTRATIONS_NAME,
   TABLE_PHOTO_ASSIGNMENTS_NAME: process.env.TABLE_PHOTO_ASSIGNMENTS_NAME,
 }
 
@@ -72,32 +70,6 @@ const impl = {
       }
       kinesis.putRecord(params, callback)
     }
-  },
-  succeedAssignment: (event, callback) => {
-    const updated = Date.now()
-    const params = {
-      TableName: constants.TABLE_PHOTO_REGISTRATIONS_NAME,
-      Key: {
-        id: event.photographer.id,
-      },
-      UpdateExpression: [
-        'set',
-        '#u=:u,',
-        '#ub=:ub,',
-      ].join(' '),
-      ExpressionAttributeNames: {
-        '#u': 'updated',
-        '#ub': 'updatedBy',
-      },
-      ExpressionAttributeValues: {
-        ':u': updated,
-        ':ub': event.origin,
-      },
-      ReturnValues: 'NONE',
-      ReturnConsumedCapacity: 'NONE',
-      ReturnItemCollectionMetrics: 'NONE',
-    }
-    dynamo.update(params, callback)
   },
   deleteAssignment: (event, callback) => {
     const params = {
@@ -157,19 +129,13 @@ module.exports = {
       if (wErr) {
         callback(`${constants.MODULE} ${constants.METHOD_WRITE_TO_STREAM} - ${wErr.stack}`)
       } else {
-        impl.succeedAssignment(event, (sErr) => {
-          if (sErr && !(sErr.code && sErr.code === 'ConditionalCheckFailedException')) { // if we fail due to the conditional check, we should proceed regardless to remain idempotent
-            callback(`${constants.MODULE} ${constants.METHOD_SUCCEED_ASSIGNMENT} - ${sErr.stack}`)
+        impl.deleteAssignment(event, (dErr) => {
+          if (dErr) {
+            callback(`${constants.MODULE} ${constants.METHOD_DELETE_ASSIGNMENT} - ${dErr.stack}`)
           } else {
-            impl.deleteAssignment(event, (dErr) => {
-              if (dErr) {
-                callback(`${constants.MODULE} ${constants.METHOD_DELETE_ASSIGNMENT} - ${dErr.stack}`)
-              } else {
-                const result = event
-                result.outcome = 'photo taken'
-                callback(null, result)
-              }
-            })
+            const result = event
+            result.outcome = 'photo taken'
+            callback(null, result)
           }
         })
       }
