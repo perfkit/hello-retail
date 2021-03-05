@@ -1,6 +1,8 @@
 import base64
 import logging
+import os
 import re
+import time
 
 import requests
 
@@ -9,7 +11,6 @@ event_processing:
   description: Hello Retail Benchmark for AWS.
   provider: aws
   region: us-east-1
-  root: ..
 """
 
 
@@ -90,9 +91,9 @@ def commitPhoto(pr_url, pg_id, phone_number, item_id, image):
 
 def encondeImage(filepath):
   image = open(filepath, 'rb')  # open binary file in read mode
-  image_read = image.read()
-  image_64_encode = base64.encodebytes(image_read)
-  return image_64_encode
+  image_64_encode = base64.b64encode(image.read())
+  image.close()
+  return image_64_encode.decode()
 
 
 # SB calls
@@ -123,16 +124,18 @@ def prepare(spec):
 
 def invokeAPI(response):
   logging.info(f"{response}")
+  time.sleep(1)
 
 
 def invoke(spec):
   invokeAPI(registerPhotographer(spec['endpoint_event_writer_api'], "photographer1", "1234567891"))
-  invokeAPI(newProduct(spec['endpoint_event_writer_api'], "1234567", "category1", "name1", "brand1", "description1"))
+  id = "3737532"
+  invokeAPI(newProduct(spec['endpoint_event_writer_api'], id, "category2", "name2", "brand1", "description1"))
   invokeAPI(listCategories(spec['endpoint_product_catalog_api']))
-  invokeAPI(listProductsByCategory(spec['endpoint_product_catalog_api'], "category1"))
-  invokeAPI(listProductsByID(spec['endpoint_product_catalog_api'], "1234567"))
-  invokeAPI(commitPhoto(spec['endpoint_photo_receive_api'], "photographer1", "1234567891", "1234567",
-                        encondeImage("benchmark_images/snowdrop.jpg")))
+  invokeAPI(listProductsByCategory(spec['endpoint_product_catalog_api'], "category2"))
+  invokeAPI(listProductsByID(spec['endpoint_product_catalog_api'], id))
+  invokeAPI(commitPhoto(spec['endpoint_photo_receive_api'], "photographer1", "1234567891", id,
+                        encondeImage(f"{os.path.dirname(__file__)}/benchmark_images/snowdrop.jpg")))
 
 
 def cleanup(spec):

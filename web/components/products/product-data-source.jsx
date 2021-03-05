@@ -2,6 +2,14 @@ import { Component, PropTypes } from 'react'
 import config from '../../config'
 import * as util from '../util'
 
+const AWS = require('aws-sdk');
+
+const constants = {
+  IMAGE_BUCKET: process.env.IMAGE_BUCKET,
+}
+
+let s3 = new AWS.S3();
+
 class ProductDataSource extends Component {
   static propTypes = {
     category: PropTypes.string,
@@ -42,13 +50,22 @@ class ProductDataSource extends Component {
     return this.getProductByIdFromApiAsync(id)
       .then((data) => {
         const productList = []
-        let pdata = JSON.parse(data)  //TODO maybe rework
+        const pdata = JSON.parse(data)
+        const params = {
+          Bucket: constants.IMAGE_BUCKET,
+          Key: `i/p/${id}`
+        };
+        let img = null
+        s3.getObject(params, function(err, data) {
+          if(!err)
+            img = data.Body.toString('utf-8')  // maybe .toString('utf-8') or .toString('binary')
+        })
         productList.push({
           brand: pdata[0].brand,
           description: pdata[0].description,
           name: pdata[0].name,
           id: pdata[0].id,
-          image: pdata[0].image ? pdata[0].image : null,
+          image: img ? `data:image/jpeg;base64,${img}` : null,
         })
         return productList
       })
@@ -62,7 +79,7 @@ class ProductDataSource extends Component {
     return this.getProductsByCategoryFromApiAsync(category)
       .then((data) => {
         const productList = []
-        JSON.parse(data).forEach((item) => {  //TODO maybe rework
+        JSON.parse(data).forEach((item) => {
           productList.push({
             brand: item.brand,
             description: item.description,

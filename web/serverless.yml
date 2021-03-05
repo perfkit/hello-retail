@@ -6,6 +6,8 @@ plugins:
   - web-app-build-plugin
 
 custom:
+  productPhotos: ${file(../product-photos/productPhotos.yml)}
+
   # AWS ARN for the S3 bucket used to host the site.
   bucketArn:
     Fn::Join: # e.g. arn:aws:s3:::stage.hello-retail.biz/*
@@ -97,6 +99,8 @@ provider:
   name: aws
   profile: ${self:custom.private.profile}
   region: ${self:custom.private.region}
+  environment:
+    IMAGE_BUCKET: ${self:custom.productPhotos.bucket}
 
 resources:
   Conditions:
