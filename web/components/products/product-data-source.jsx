@@ -47,25 +47,22 @@ class ProductDataSource extends Component {
   }
 
   getProductsByIdAsync(id) {
-    return this.getProductByIdFromApiAsync(id)
-      .then((data) => {
+    const params = {
+      Bucket: constants.IMAGE_BUCKET,
+      Key: `i/p/${id}`
+    };
+    return Promise.all([this.getProductByIdFromApiAsync(id), s3.getObject(params).promise().then(value => {return value}, () => {return null})])
+      .then((results) => {
+        const image = results[1]
+        const data = results[0]
         const productList = []
         const pdata = JSON.parse(data)
-        const params = {
-          Bucket: constants.IMAGE_BUCKET,
-          Key: `i/p/${id}`
-        };
-        let img = null
-        s3.getObject(params, function(err, data) {
-          if(!err)
-            img = data.Body.toString('utf-8')  // maybe .toString('utf-8') or .toString('binary')
-        })
         productList.push({
           brand: pdata[0].brand,
           description: pdata[0].description,
           name: pdata[0].name,
           id: pdata[0].id,
-          image: img ? `data:image/jpeg;base64,${img}` : null,
+          image: image ? `data:image/jpeg;base64,${image.Body.toString('utf-8')}` : null,
         })
         return productList
       })
