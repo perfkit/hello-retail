@@ -76,6 +76,7 @@ custom:
   webAppBuild:
     configPath: ./config.js
     configValues:
+      ImageBucket: ${self:custom.productPhotos.bucket}
       WebAppName: Hello Retail
       Stage: ${self:custom.stage}
       AWSRegion: ${self:custom.private.region}
@@ -99,8 +100,6 @@ provider:
   name: aws
   profile: ${self:custom.private.profile}
   region: ${self:custom.private.region}
-  environment:
-    IMAGE_BUCKET: ${self:custom.productPhotos.bucket}
 
 resources:
   Conditions:

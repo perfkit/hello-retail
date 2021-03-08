@@ -4,10 +4,6 @@ import * as util from '../util'
 
 const AWS = require('aws-sdk');
 
-const constants = {
-  IMAGE_BUCKET: process.env.IMAGE_BUCKET,
-}
-
 let s3 = new AWS.S3();
 
 class ProductDataSource extends Component {
@@ -48,7 +44,7 @@ class ProductDataSource extends Component {
 
   getProductsByIdAsync(id) {
     const params = {
-      Bucket: constants.IMAGE_BUCKET,
+      Bucket: config.ImageBucket,
       Key: `i/p/${id}`
     };
     return Promise.all([this.getProductByIdFromApiAsync(id), s3.getObject(params).promise().then(value => {return value}, () => {return null})])
