@@ -161,6 +161,13 @@ resources:
         WebsiteConfiguration:
           IndexDocument: index.html
           ErrorDocument: error.html
+        CorsConfiguration:
+          CorsRules:
+            - AllowedMethods:
+                - GET
+                - HEAD
+              AllowedOrigins:
+                - "*"
 
     HelloRetailWebBucketPolicy:
       Type: AWS::S3::BucketPolicy

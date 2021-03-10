@@ -1,10 +1,8 @@
-import { Component, PropTypes } from 'react'
+import {Component, PropTypes} from 'react'
 import config from '../../config'
 import * as util from '../util'
 
-const AWS = require('aws-sdk');
-
-let s3 = new AWS.S3();
+const https = require('https');
 
 class ProductDataSource extends Component {
   static propTypes = {
@@ -43,11 +41,34 @@ class ProductDataSource extends Component {
   }
 
   getProductsByIdAsync(id) {
-    const params = {
-      Bucket: config.ImageBucket,
-      Key: `i/p/${id}`
-    };
-    return Promise.all([this.getProductByIdFromApiAsync(id), s3.getObject(params).promise().then(value => {return value}, () => {return null})])
+    return Promise.all([this.getProductByIdFromApiAsync(id), new Promise((resolve, reject) => {
+      https.get(`https://s3.amazonaws.com/${config.ImageBucket}/i/p/${id}`, (res) => {
+        var { statusCode } = res;
+        let error;
+        if (statusCode !== 200) {
+          error = new Error('Request Failed.\n' +
+            `Status Code: ${statusCode}`);
+        }
+        if (error) {
+          console.error(error.message);
+          // consume response data to free up memory
+          res.resume();
+        }
+        res.setEncoding('utf8');
+        let rawData = '';
+        res.on('data', (chunk) => {
+          rawData += chunk;
+        });
+        res.on('end', () => {
+          try {
+            resolve(rawData);
+          } catch (e) {
+            resolve(null);
+          }
+        });
+      }).on('error', (e) => {
+        resolve(null)
+      })})])
       .then((results) => {
         const image = results[1]
         const data = results[0]
@@ -58,7 +79,7 @@ class ProductDataSource extends Component {
           description: pdata[0].description,
           name: pdata[0].name,
           id: pdata[0].id,
-          image: image ? `data:image/jpeg;base64,${image.Body.toString('utf-8')}` : null,
+          image: image ? `data:image/jpeg;base64,${image}` : null,
         })
         return productList
       })
