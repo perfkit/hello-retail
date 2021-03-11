@@ -9,7 +9,7 @@ States:
         States:
           AssignPhotographer:
             Type: Task
-            Resource: !Sub 'arn:aws:lambda:${self:custom.private.region}:${AWS::AccountId}:function:${self:custom.productPhotos.assignName}-${self:custom.stage}-assign'
+            Resource: arn:aws:lambda:${self:custom.private.region}:${env:ACCOUNT_ID}:function:${self:custom.productPhotos.assignName}-${self:custom.stage}-assign
             Retry:
               - ErrorEquals:
                   - States.ALL
@@ -41,7 +41,7 @@ States:
             Next: AwaitPhotoSucceed
           AwaitPhotoFail:
             Type: Task
-            Resource: !Sub 'arn:aws:lambda:${self:custom.private.region}:${AWS::AccountId}:function:${self:custom.productPhotos.failName}-${self:custom.stage}-fail'
+            Resource: arn:aws:lambda:${self:custom.private.region}:${env:ACCOUNT_ID}:function:${self:custom.productPhotos.failName}-${self:custom.stage}-fail
             Retry:
               - ErrorEquals:
                   - States.ALL
@@ -59,7 +59,7 @@ States:
             Error: RepeatedFailure
           AwaitPhotoSucceed:
             Type: Task
-            Resource: !Sub 'arn:aws:lambda:${self:custom.private.region}:${AWS::AccountId}:function:${self:custom.productPhotos.successName}-${self:custom.stage}-success'
+            Resource: arn:aws:lambda:${self:custom.private.region}:${env:ACCOUNT_ID}:function:${self:custom.productPhotos.successName}-${self:custom.stage}-success
             Retry:
               - ErrorEquals:
                   - States.ALL
@@ -84,7 +84,7 @@ States:
     Next: CompleteAssignment
   CompleteAssignment:
     Type: Task
-    Resource: !Sub 'arn:aws:lambda:${self:custom.private.region}:${AWS::AccountId}:function:${self:custom.productPhotos.reportName}-${self:custom.stage}-report'
+    Resource: arn:aws:lambda:${self:custom.private.region}:${env:ACCOUNT_ID}:function:${self:custom.productPhotos.reportName}-${self:custom.stage}-report
     Retry:
       - ErrorEquals:
           - States.ALL

@@ -29,7 +29,7 @@ functions:
         'Fn::ImportValue': ${self:custom.productPhotos.exportPhotoRegistrationsTableName}
     events:
       - stream:
-          arn: !Sub 'arn:aws:kinesis:${self:provider.region}:${AWS::AccountId}:stream/${self:custom.stage}RetailStream'
+          arn: arn:aws:kinesis:${self:provider.region}:${env:ACCOUNT_ID}:stream/${self:custom.stage}RetailStream
           enabled: true
           startingPosition: TRIM_HORIZON
 
