@@ -39,7 +39,7 @@ exportPhotoAssignmentsReportLambdaArn: ${self:custom.productPhotos.reportName}:$
 
 # Activities
 receiveActivityName: ${self:custom.stage}-${self:custom.productPhotos.name}-receive
-receiveActivityArn: arn:aws:states:${self:custom.private.region}:${self:custom.private.accountId}:activity:${self:custom.productPhotos.receiveActivityName}
+receiveActivityArn: !Sub 'arn:aws:states:${self:custom.private.region}:${AWS::AccountId}:activity:${self:custom.productPhotos.receiveActivityName}'
 
 # Step Function
 processName: ${self:custom.productPhotos.name}-process

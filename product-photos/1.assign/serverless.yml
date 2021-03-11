@@ -1,4 +1,4 @@
-frameworkVersion: '>=1.0.0 <2.0.0'
+frameworkVersion: "^2.1.0"
 
 service: ${self:custom.productPhotos.assignName}
 
@@ -11,7 +11,6 @@ custom:
 provider:
   name: aws
   runtime: nodejs12.x
-  profile: ${self:custom.private.profile}
   region: ${self:custom.private.region}
   timeout: 65
 
@@ -20,6 +19,7 @@ functions:
     role:
       'Fn::GetAtt': [ AssignRole, Arn ]
     handler: assign.handler
+    memorySize: 1024
     environment:
       ACTIVITY_RECEIVE_ARN: ${self:custom.productPhotos.receiveActivityArn}
       TABLE_PHOTO_ASSIGNMENTS_NAME:

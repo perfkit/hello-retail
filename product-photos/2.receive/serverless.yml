@@ -1,4 +1,4 @@
-frameworkVersion: '>=1.0.0 <2.0.0'
+frameworkVersion: "^2.1.0"
 
 service: ${self:custom.productPhotos.receiveName}
 
@@ -11,7 +11,6 @@ custom:
 provider:
   name: aws
   runtime: nodejs12.x
-  profile: ${self:custom.private.profile}
   region: ${self:custom.private.region}
 
 functions:
@@ -19,6 +18,8 @@ functions:
     role:
       Fn::GetAtt: [ ReceiveRole, Arn ]
     handler: receive.handler
+    memorySize: 1024
+    timeout: 30
     environment:
       IMAGE_BUCKET: ${self:custom.productPhotos.bucket}
       ENDPOINT:

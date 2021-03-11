@@ -1,6 +1,5 @@
-export COMPANY=<PLACEHOLDER_COMPANY>
-export TEAM=<PLACEHOLDER_TEAM>
+export COMPANY=$3
+export TEAM=$4
 export REGION=$1
-export STAGE=prod
-export AWS_PROFILE=<PLACEHOLDER_YOUR_AWS_PROFILE>
+export STAGE=$2
 npm run root:install:all

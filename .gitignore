@@ -29,6 +29,7 @@ coverage
 
 # Compiled binary addons (http://nodejs.org/api/addons.html)
 build/Release
+__pycache__
 
 # Dependency directories
 node_modules
@@ -56,11 +57,7 @@ web/config.js
 # Package locks
 package-lock.json
 
-# Private data and secrets
-private.yml
-install.sh
-deploy.sh
-remove.sh
-
 # Bundle.js - generated every build
 web/app/bundle.js
+
+.sb/config.yml

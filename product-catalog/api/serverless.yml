@@ -1,4 +1,4 @@
-frameworkVersion: '>=1.0.0 <2.0.0'
+frameworkVersion: "^2.1.0"
 
 service: ${self:custom.helloRetail.name}-product-catalog-api
 
@@ -18,7 +18,6 @@ custom:
 provider:
   name: aws
   runtime: nodejs12.x
-  profile: ${self:custom.private.profile}
   region: ${self:custom.private.region}
 
 functions:
@@ -26,6 +25,7 @@ functions:
     role:
       Fn::GetAtt: [ ProductCatalogApiCategoriesReader, Arn ]
     handler: catalogApi.categories
+    memorySize: 1024
     environment:
       TABLE_PRODUCT_CATEGORY_NAME:
         Fn::ImportValue: ${self:custom.productCatalogBuilder.custom.exportProductCategoryTableName}
@@ -38,6 +38,7 @@ functions:
     role:
       Fn::GetAtt: [ ProductCatalogApiProductsReader, Arn ]
     handler: catalogApi.products
+    memorySize: 1024
     environment:
       TABLE_PRODUCT_CATALOG_NAME:
         Fn::ImportValue: ${self:custom.productCatalogBuilder.custom.exportProductCatalogTableName}

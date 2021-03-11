@@ -1,4 +1,4 @@
-frameworkVersion: '>=1.0.0 <2.0.0'
+frameworkVersion: "^2.1.0"
 
 service: ${self:custom.helloRetail.name}-product-catalog-builder
 
@@ -22,7 +22,6 @@ custom:
 provider:
   name: aws
   runtime: nodejs12.x
-  profile: ${self:custom.private.profile}
   region: ${self:custom.private.region}
 
 functions:
@@ -30,6 +29,7 @@ functions:
     role:
       Fn::GetAtt: [ ProductCatalogBuilder, Arn ]
     handler: catalog.processKinesisEvent
+    memorySize: 1024
     environment:
       TABLE_PRODUCT_CATEGORY_NAME:
         Ref: ProductCategory
@@ -37,7 +37,7 @@ functions:
         Ref: ProductCatalog
     events:
       - stream:
-          arn: 'arn:aws:kinesis:${self:provider.region}:${self:custom.private.accountId}:stream/${self:custom.stage}RetailStream' # replace this with the below, once supported by Serverless
+          arn: !Sub 'arn:aws:kinesis:${self:provider.region}:${AWS::AccountId}:stream/${self:custom.stage}RetailStream' # replace this with the below, once supported by Serverless
 #            Fn::ImportValue: ${self:custom.retailStream.custom.exportRetailStreamArn}
           enabled: true
           startingPosition: TRIM_HORIZON
@@ -60,9 +60,7 @@ resources:
         KeySchema:
           - AttributeName: category
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+        BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.stage}-ProductCategory-${self:custom.productCatalogBuilderVersion}
     ProductCatalog:
       Type: AWS::DynamoDB::Table
@@ -77,9 +75,7 @@ resources:
         KeySchema:
           - AttributeName: id
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+        BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.stage}-ProductCatalog-${self:custom.productCatalogBuilderVersion}
         GlobalSecondaryIndexes:
           - IndexName: Category
@@ -93,9 +89,6 @@ resources:
               NonKeyAttributes:
                 - brand
                 - description
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
     # Product Catalog Roles
     ProductCatalogBuilder: # role for the Catalog (Maintaining) Lambda
       Type: AWS::IAM::Role
@@ -109,7 +102,7 @@ resources:
               Action: sts:AssumeRole
               Principal:
                 AWS: # role ARNs that are allowed to write to the Product Catalog
-                  - 'arn:aws:iam::${self:custom.private.accountId}:role/${self:custom.private.teamRole}'
+                  - !Sub 'arn:aws:iam::${AWS::AccountId}:root'
             - Effect: Allow
               Action: sts:AssumeRole
               Principal:
@@ -156,7 +149,7 @@ resources:
                    Resource:
                     Fn::Join:
                       - '/'
-                      - - 'arn:aws:dynamodb:${self:provider.region}:${self:custom.private.accountId}:table'
+                      - - !Sub 'arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table'
                         - Ref: ProductCategory
                 -  Effect: Allow
                    Action:
@@ -164,7 +157,7 @@ resources:
                    Resource:
                     Fn::Join:
                       - '/'
-                      - - 'arn:aws:dynamodb:${self:provider.region}:${self:custom.private.accountId}:table'
+                      - - !Sub 'arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table'
                         - Ref: ProductCatalog
 
   Outputs:
@@ -179,7 +172,7 @@ resources:
       Value:
         Fn::Join:
           - '/'
-          - - 'arn:aws:dynamodb:${self:provider.region}:${self:custom.private.accountId}:table'
+          - - !Sub 'arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table'
             - Ref: ProductCategory
       Export:
         Name: ${self:custom.productCatalogBuilder.custom.exportProductCategoryTableArn}
@@ -194,7 +187,7 @@ resources:
       Value:
         Fn::Join:
           - '/'
-          - - 'arn:aws:dynamodb:${self:provider.region}:${self:custom.private.accountId}:table'
+          - - !Sub 'arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table'
             - Ref: ProductCatalog
       Export:
         Name: ${self:custom.productCatalogBuilder.custom.exportProductCatalogTableArn}
@@ -203,7 +196,7 @@ resources:
       Value:
         Fn::Join:
           - '/'
-          - - 'arn:aws:dynamodb:${self:provider.region}:${self:custom.private.accountId}:table'
+          - - !Sub 'arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table'
             - Ref: ProductCatalog
             - index
             - Category

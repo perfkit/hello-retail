@@ -1,18 +1,7 @@
-region: <REGION_PLACEHOLDER>
-
-company: <COMPANY_PLACEHOLDER>
-team: <TEAM_PLACEHOLDER>
-stage: prod
+region: ${env:REGION}
+company: ${env:COMPANY}
+team: ${env:TEAM}
+stage: ${env:STAGE}
 
 domainName: hello-retail.biz
-
-profile: <YOUR_AWS_PROFILE_NAME>
-accountId: <YOUR_AWS_PROFILE_ACCOUNT_ID>
-
-teamRole: <YOUR_AWS_PROFILE_NAME> # IAM Role
-teamPolicy: arn:aws:iam::aws:policy/AWSLambdaFullAccess  #<Your Team's Managed Policy for your IAM Role>
-
-# Core Stream
-coreStream:
-  accountId: <YOUR_AWS_PROFILE_ACCOUNT_ID>
-  awslabsRoleArn: arn:aws:iam::${self:custom.private.coreStream.accountId}:role/fanoutRole
+teamPolicy: arn:aws:iam::aws:policy/AWSLambdaFullAccess 

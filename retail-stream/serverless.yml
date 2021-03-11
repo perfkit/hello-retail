@@ -1,4 +1,4 @@
-frameworkVersion: '>=1.0.0 <2.0.0'
+frameworkVersion: "^2.1.0"
 
 service: ${self:custom.helloRetail.name}-stream
 
@@ -19,7 +19,6 @@ custom:
 provider:
   name: aws
   runtime: nodejs12.x
-  profile: ${self:custom.private.profile}
   region: ${self:custom.private.region}
   environment:
     STAGE: ${self:custom.stage}
@@ -45,7 +44,7 @@ resources:
             - Effect: Allow
               Principal:
                 AWS: # role ARNs that are allowed to write to the Retail stream
-                  - arn:aws:iam::${self:custom.private.accountId}:role/${self:custom.private.teamRole}
+                  - !Sub 'arn:aws:iam::${AWS::AccountId}:root'
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - ${self:custom.private.teamPolicy}
@@ -73,7 +72,7 @@ resources:
             - Effect: Allow
               Principal:
                 AWS: # role ARNs that are allowed to read from the Retail stream
-                  - 'arn:aws:iam::${self:custom.private.accountId}:role/${self:custom.private.teamRole}'
+                  - !Sub 'arn:aws:iam::${AWS::AccountId}:root'
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - ${self:custom.private.teamPolicy}

@@ -1,4 +1,4 @@
-frameworkVersion: '>=1.0.0 <2.0.0'
+frameworkVersion: "^2.1.0"
 
 service: ${self:custom.productPhotos.dataName}
 
@@ -11,7 +11,6 @@ custom:
 provider:
   name: aws
   runtime: nodejs12.x
-  profile: ${self:custom.private.profile}
   region: ${self:custom.private.region}
 
 resources:
@@ -31,9 +30,7 @@ resources:
         KeySchema:
           - AttributeName: id
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
+        BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.stage}-${self:service}-PhotoRegistrations-${self:custom.productPhotos.productPhotosVersion}
         GlobalSecondaryIndexes:
           - IndexName: Assignments
@@ -42,9 +39,6 @@ resources:
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 10
-              WriteCapacityUnits: 10
     # A DynamoDB table for recording the relationships between photographers and the StepFunctions executions that
     # have requested that they take a photograph.  Although only the phone number is the hash key, the table will be
     # filled with the 'taskToken', 'taskEvent', and assignment 'status' associated with a StepFunction's execution's
@@ -59,9 +53,7 @@ resources:
         KeySchema:
           - AttributeName: id
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
+        BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.stage}-${self:service}-PhotoAssignments-${self:custom.productPhotos.productPhotosVersion}
   Outputs:
     # Registrations
@@ -76,7 +68,7 @@ resources:
       Value:
         'Fn::Join':
           - '/'
-          - - 'arn:aws:dynamodb:${self:provider.region}:${self:custom.private.accountId}:table'
+          - - !Sub 'arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table'
             - Ref: PhotoRegistrations
       Export:
         Name: ${self:custom.productPhotos.exportPhotoRegistrationsTableArn}
@@ -85,7 +77,7 @@ resources:
       Value:
         'Fn::Join':
           - '/'
-          - - 'arn:aws:dynamodb:${self:provider.region}:${self:custom.private.accountId}:table'
+          - - !Sub 'arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table'
             - Ref: PhotoRegistrations
             - index
             - Assignments
@@ -103,7 +95,7 @@ resources:
       Value:
         'Fn::Join':
           - '/'
-          - - 'arn:aws:dynamodb:${self:provider.region}:${self:custom.private.accountId}:table'
+          - - !Sub 'arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table'
             - Ref: PhotoAssignments
       Export:
         Name: ${self:custom.productPhotos.exportPhotoAssignmentsTableArn}

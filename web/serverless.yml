@@ -1,4 +1,4 @@
-frameworkVersion: '>=1.0.0 <2.0.0'
+frameworkVersion: "^2.1.0"
 
 service: ${self:custom.helloRetail.name}-website
 
@@ -81,7 +81,7 @@ custom:
       Stage: ${self:custom.stage}
       AWSRegion: ${self:custom.private.region}
       SessionName: ${self:custom.helloRetail.name}-website-${self:custom.stage}
-      WebAppRole: arn:aws:iam::${self:custom.private.accountId}:role/${self:custom.stage}HelloRetailWebIdentity
+      WebAppRole: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${self:custom.stage}HelloRetailWebIdentity'
       ProductCatalogTableName:
         Fn::ImportValue: ${self:custom.productCatalogBuilder.custom.exportProductCatalogTableName}
       ProductCategoryTableName:
@@ -98,7 +98,6 @@ custom:
 
 provider:
   name: aws
-  profile: ${self:custom.private.profile}
   region: ${self:custom.private.region}
 
 resources:
@@ -187,7 +186,7 @@ resources:
               Resource: ${self:custom.bucketArn}
               Principal:
                 AWS:
-                  - 'arn:aws:iam::${self:custom.private.accountId}:role/${self:custom.stage}HelloRetailWebIdentity'
+                  - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${self:custom.stage}HelloRetailWebIdentity'
       DependsOn:
         - HelloRetailWebBucket
 

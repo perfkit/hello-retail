@@ -1,4 +1,4 @@
-frameworkVersion: '>=1.0.0 <2.0.0'
+frameworkVersion: "^2.1.0"
 
 service: ${self:custom.productPhotos.processorName}
 
@@ -13,7 +13,6 @@ custom:
 provider:
   name: aws
   runtime: nodejs12.x
-  profile: ${self:custom.private.profile}
   region: ${self:custom.private.region}
 
 functions:
@@ -21,6 +20,7 @@ functions:
     role:
       'Fn::GetAtt': [ ProcessorRole, Arn ]
     handler: processor.processKinesisEvent
+    memorySize: 1024
     environment:
       STAGE: ${self:custom.stage}
       STEP_FUNCTION:
@@ -29,8 +29,7 @@ functions:
         'Fn::ImportValue': ${self:custom.productPhotos.exportPhotoRegistrationsTableName}
     events:
       - stream:
-          arn: 'arn:aws:kinesis:${self:provider.region}:${self:custom.private.accountId}:stream/${self:custom.stage}RetailStream' # replace this with the below, once supported by Serverless
-#            Fn::ImportValue: ${self:custom.retailStream.custom.exportRetailStreamArn}
+          arn: !Sub 'arn:aws:kinesis:${self:provider.region}:${AWS::AccountId}:stream/${self:custom.stage}RetailStream'
           enabled: true
           startingPosition: TRIM_HORIZON
 

@@ -1,6 +1,7 @@
 import base64
 import logging
 import os
+import random
 import re
 import time
 
@@ -11,6 +12,9 @@ event_processing:
   description: Hello Retail Benchmark for AWS.
   provider: aws
   region: us-east-1
+  stage: prod
+  team: simont
+  company: uniwue
 """
 
 
@@ -98,10 +102,9 @@ def encondeImage(filepath):
 
 # SB calls
 
+# run './install.sh <REGION> <STAGE> <COMPANY> <TEAM>' before deploying with sb!
 def prepare(spec):
-  # set private.yml region to specified region! default: us-east-1
-  # sb login with: sb login aws --profile=<YOUR_AWS_PROFILE_NAME>
-  log = spec.run(f"./deploy.sh {spec['region']}", image='serverless_cli')
+  log = spec.run(f"./deploy.sh {spec['region']} {spec['stage']} {spec['company']} {spec['team']}", image='serverless_cli')
 
   urls = re.findall(r" [-] https://[-\w.]+execute-api[-\w.]+/\w+/[\w-]+", log)
   for url in urls:
@@ -128,15 +131,16 @@ def invokeAPI(response):
 
 
 def invoke(spec):
-  invokeAPI(registerPhotographer(spec['endpoint_event_writer_api'], "photographer1", "1234567891"))
-  id = "3737532"
-  invokeAPI(newProduct(spec['endpoint_event_writer_api'], id, "category2", "name2", "brand1", "description1"))
+  photo_id = f"{random.randint(1000000000, 9999999999)}"
+  id = f"{random.randint(1000000, 9999999)}"
+  cat = f"category-{random.randint(1, 6)}"
+  invokeAPI(registerPhotographer(spec['endpoint_event_writer_api'], f"photographer-{photo_id}", photo_id))
+  invokeAPI(newProduct(spec['endpoint_event_writer_api'], id, cat, f"name{id}", f"brand-{id}", f"description-{id}"))
   invokeAPI(listCategories(spec['endpoint_product_catalog_api']))
-  invokeAPI(listProductsByCategory(spec['endpoint_product_catalog_api'], "category2"))
+  invokeAPI(listProductsByCategory(spec['endpoint_product_catalog_api'], cat))
   invokeAPI(listProductsByID(spec['endpoint_product_catalog_api'], id))
-  invokeAPI(commitPhoto(spec['endpoint_photo_receive_api'], "photographer1", "1234567891", id,
-                        encondeImage(f"{os.path.dirname(__file__)}/benchmark_images/snowdrop.jpg")))
+  invokeAPI(commitPhoto(spec['endpoint_photo_receive_api'], f"photographer-{photo_id}", photo_id, id, encondeImage(f"{os.path.dirname(__file__)}/benchmark_images/snowdrop.jpg")))
 
 
 def cleanup(spec):
-  spec.run(f"./remove.sh {spec['region']}", image='serverless_cli')
+  spec.run(f"./remove.sh {spec['region']} {spec['stage']} {spec['company']} {spec['team']}", image='serverless_cli')
