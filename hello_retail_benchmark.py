@@ -102,8 +102,10 @@ def encondeImage(filepath):
 
 # SB calls
 
-# run './install.sh <REGION> <STAGE> <COMPANY> <TEAM>' before deploying with sb!
 def prepare(spec):
+  if not os.path.exists(os.path.dirname(__file__) + "/node_modules"):           # if no dependencies are installed, install dependencies
+    spec.run(f"./install.sh {spec['region']} {spec['stage']} {spec['company']} {spec['team']}", image='serverless_cli')
+
   log = spec.run(f"./deploy.sh {spec['region']} {spec['stage']} {spec['company']} {spec['team']}", image='serverless_cli')
 
   urls = re.findall(r" [-] https://[-\w.]+execute-api[-\w.]+/\w+/[\w-]+", log)
