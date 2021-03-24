@@ -50,39 +50,44 @@ const pr_url = __ENV.PHOTO_RECEIVE_URL
 const image_data = open(__ENV.IMAGE_FILE)
 
 const vu_states = {}
+const min_photo_id = 1000000000
+const min_category_id = 0
+const min_product_id = 1000000
 
 const actions = [
 	{
 		name: "RegisterPhotographer",
 		weight: 0.1,
 		run: (state, xray_header) => {
-			const photo_id = String(randomIntBetween(1000000000, 9999999999))
+			const photo_id = state.current_photo_id++
+			
 			const res = registerPhotographer(`photographer-${photo_id}`, photo_id, xray_header);
 //			console.log(JSON.stringify(res))
 			check(res, {
 				'status is 200': (res) => res.status === 200,
 			})
 			// if (res.status != 200) console.log(JSON.stringify(res))
-
-			state.photographers[photo_id] = true
 		},
 	},
 	{
 		name: "NewProduct",
 		weight: 0.1,
 		run: (state, xray_header) => {
-			const id = String(randomIntBetween(1000000, 9999999))
-			const cat_id = String(randomIntBetween(1, 6))
+			const id = state.current_product_id++
+			const new_cat_prob = Math.random()
+			
+			let cat_id = String(randomIntBetween(min_category_id, state.current_category_id+1))
+			if (new_cat_prob > 0.9) {
+				cat_id = String(++state.current_category_id)
+			}
 			const cat = `category-${cat_id}`
+			
 			const res = newProduct(id, cat, `name${id}`, `brand-${id}`, `description-${id}`, xray_header);
 //			console.log(JSON.stringify(res))
 			check(res, {
 				'status is 200': (res) => res.status === 200,
 			})
 			// if (res.status != 200) console.log(JSON.stringify(res))
-
-			state.products[id] = true
-			state.categories[cat_id] = true
 		},
 	},
 	{
@@ -101,9 +106,12 @@ const actions = [
 		name: "ListProductsByCategory",
 		weight: 0.3,
 		run: (state, xray_header) => {
-			const allCategories = Object.keys(state.categories)
-			const cat_id = allCategories[randomIntBetween(0, allCategories.length)]
+			// Check if any categories have been initialized
+			if (state.current_category_id < min_category_id) return
+
+			const cat_id = randomIntBetween(min_category_id, state.current_category_id)
 			const cat = `category-${cat_id}`
+			
 			const res = listProductsByCategory(cat, xray_header)
 			// console.log(JSON.stringify(res))
 			check(res, {
@@ -116,8 +124,10 @@ const actions = [
 		name: "ListProductsByID",
 		weight: 0.1,
 		run: (state, xray_header) => {
-			const allProducts = Object.keys(state.products)
-			const id = allProducts[randomIntBetween(0, allProducts.length)]
+			// Check if any products have been initialized
+			if (state.current_product_id < min_product_id) return
+			const id = randomIntBetween(min_product_id, state.current_product_id)
+			
 			const res = listProductsByID(id, xray_header)
 //			console.log(JSON.stringify(res))
 			check(res, {
@@ -131,10 +141,12 @@ const actions = [
 		name: "CommitPhoto",
 		weight: 0.1,
 		run: (state, xray_header) => {
-			const allProducts = Object.keys(state.products)
-			const id = allProducts[randomIntBetween(0, allProducts.length)]
-			const allPhotographers = Object.keys(state.photographers)
-			const photo_id = allPhotographers[randomIntBetween(0, allPhotographers.length)]
+			// Check if any products and photographer have been initialized
+			if (state.current_product_id < min_product_id) return
+			if (state.current_photo_id < min_photo_id) return
+			const id = randomIntBetween(min_product_id, state.current_product_id)
+			const photo_id = randomIntBetween(min_photo_id, state.current_photo_id)
+			
 			const res = commitPhoto(`photographer-${photo_id}`, photo_id, id, image_data, xray_header)
 //			console.log(JSON.stringify(res))
 			check(res, {
@@ -147,7 +159,11 @@ const actions = [
 ]
 
 export default function() {
-	const state = vu_states[__VU] || { products: {}, categories: {}, photographers: {} }
+	const state = vu_states[__VU] || {
+		current_photo_id: min_photo_id-1,
+		current_category_id: min_category_id-1,
+		current_product_id: min_product_id-1
+	}
 //	console.log(`vu ${__VU}: ` + JSON.stringify(state))
 
 	// Normalize the action weights
@@ -163,7 +179,7 @@ export default function() {
 		threshold -= candidate.weight;
 		return false;
 	}) || actions[randomIndex];
-	// const action = actions[5]
+	// const action = actions[1]
 	// console.log(`[vu ${__VU}] Action: ${action.name}`)
 
 	const xray_header = getXrayTraceHeader()
