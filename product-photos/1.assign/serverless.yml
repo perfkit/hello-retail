@@ -13,11 +13,14 @@ provider:
   runtime: nodejs12.x
   region: ${self:custom.private.region}
   timeout: 65
+  tracing:
+    apiGateway: true
+    lambda: true
 
 functions:
   assign:
     role:
-      'Fn::GetAtt': [ AssignRole, Arn ]
+      Fn::GetAtt: [ AssignRole, Arn ]
     handler: assign.handler
     memorySize: 1024
     environment:
@@ -51,6 +54,8 @@ resources:
         ManagedPolicyArns:
           - arn:aws:iam::aws:policy/AWSLambda_FullAccess
           - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+          # Lambda execution role permissions for XRay: https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html#services-xray-permissions
+          - arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
         Policies:
           - PolicyName: CreateAndWriteToLogStream
             PolicyDocument:
@@ -60,14 +65,14 @@ resources:
                   Action:
                     - 'logs:CreateLogStream'
                   Resource:
-                    'Fn::GetAtt': [ AssignLogGroup, Arn ]
+                    Fn::GetAtt: [ AssignLogGroup, Arn ]
                 - Effect: Allow
                   Action:
                     - 'logs:PutLogEvents'
                   Resource:
                     'Fn::Join':
                       - ':'
-                      - - 'Fn::GetAtt': [ AssignLogGroup, Arn ]
+                      - - Fn::GetAtt: [ AssignLogGroup, Arn ]
                         - '*'
           - PolicyName: GetAndFailActivityTask
             PolicyDocument:
@@ -91,6 +96,6 @@ resources:
     AssignLambdaArn:
       Description: The Name of the Photo Assignments Assign Lambda
       Value:
-        'Fn::GetAtt': [ AssignLambdaFunction, Arn ]
+        Fn::GetAtt: [ AssignLambdaFunction, Arn ]
       Export:
         Name: ${self:custom.productPhotos.exportPhotoAssignmentsAssignLambdaArn}

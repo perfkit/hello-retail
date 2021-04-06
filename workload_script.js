@@ -21,7 +21,7 @@ const actions = [
 			const photo_id = state.current_photo_id++
 			
 			const res = registerPhotographer(`photographer-${photo_id}`, photo_id, xray_header);
-//			console.log(JSON.stringify(res))
+			// console.log(JSON.stringify(res))
 			check(res, {
 				'status is 200': (res) => res.status === 200,
 			})
@@ -42,7 +42,7 @@ const actions = [
 			const cat = `category-${cat_id}`
 			
 			const res = newProduct(id, cat, `name${id}`, `brand-${id}`, `description-${id}`, xray_header);
-//			console.log(JSON.stringify(res))
+			// console.log(JSON.stringify(res))
 			check(res, {
 				'status is 200': (res) => res.status === 200,
 			})
@@ -88,7 +88,7 @@ const actions = [
 			const id = randomIntBetween(min_product_id, state.current_product_id)
 			
 			const res = listProductsByID(id, xray_header)
-//			console.log(JSON.stringify(res))
+			// console.log(JSON.stringify(res))
 			check(res, {
 				'status is 200': (res) => res.status === 200,
 			})
@@ -107,7 +107,7 @@ const actions = [
 			const photo_id = randomIntBetween(min_photo_id, state.current_photo_id)
 			
 			const res = commitPhoto(`photographer-${photo_id}`, photo_id, id, image_data, xray_header)
-//			console.log(JSON.stringify(res))
+			// console.log(JSON.stringify(res))
 			check(res, {
 				'status is 200': (res) => res.status === 200,
 			})
@@ -123,7 +123,7 @@ export default function() {
 		current_category_id: min_category_id-1,
 		current_product_id: min_product_id-1
 	}
-//	console.log(`vu ${__VU}: ` + JSON.stringify(state))
+	// console.log(`vu ${__VU}: ` + JSON.stringify(state))
 
 	// Normalize the action weights
 	const actions_total_weight = actions.map(x => x.weight).reduce((acc, weight) => acc + weight)
@@ -139,7 +139,7 @@ export default function() {
 		return false;
 	}) || actions[randomIndex];
 	// const action = actions[1]
-	// console.log(`[vu ${__VU}] Action: ${action.name}`)
+	console.log(`[vu ${__VU}] Action: ${action.name}`)
 
 	const xray_header = getXrayTraceHeader()
 
@@ -151,13 +151,17 @@ export default function() {
 function registerPhotographer(pg_id, phone_number, xray_header) {
 	const data = {
 		'schema': 'com.nordstrom/user-info/update-phone/1-0-0',
-		'id': pg_id,
-		'phone': phone_number,  // random 10-digit number
+		'id': pg_id.toString(),
+		'phone': phone_number.toString(),  // random 10-digit number as String
 		'origin': 'hello-retail/sb-register-photographer/dummy_id/dummy_name',
 	}
-	return http.request("POST", `${ew_url}/event-writer`, JSON.stringify(data), {
+	return http.post(`${ew_url}/event-writer`, JSON.stringify(data), {
 		headers: {
-			'Content-Type': 'application/json'
+			'Content-Type': 'application/json',
+			'X-Amzn-Trace-Id': xray_header
+		},
+		tags: { // Each request is tagged in the metrics with the corresponding x-ray header
+			'xray_header': xray_header,
 		}
 	})
 }
@@ -165,50 +169,70 @@ function registerPhotographer(pg_id, phone_number, xray_header) {
 function newProduct(prod_id, prod_category, prod_name, prod_brand, prod_desc, xray_header) {
 	const data = {
 		'schema': 'com.nordstrom/product/create/1-0-0',
-		'id': prod_id,
+		'id': prod_id.toString(),
 		'origin': 'hello-retail/sb-create-product/dummy_id/dummy_name',
 		'category': prod_category.trim(),
 		'name': prod_name.trim(),
 		'brand': prod_brand.trim(),
 		'description': prod_desc.trim(),
 	}
-	return http.request("POST", `${ew_url}/event-writer`, JSON.stringify(data), {
+	return http.post(`${ew_url}/event-writer`, JSON.stringify(data), {
 		headers: {
-			'Content-Type': 'application/json'
+			'Content-Type': 'application/json',
+			'X-Amzn-Trace-Id': xray_header
+		},
+		tags: { // Each request is tagged in the metrics with the corresponding x-ray header
+			'xray_header': xray_header,
 		}
 	})
 }
 
 function listCategories(xray_header) {
-	return http.request("GET", `${pc_url}/categories`)
+	return http.get(`${pc_url}/categories`, getXRayHttpParams(xray_header))
 }
 
 function listProductsByCategory(category, xray_header) {
-	return http.request("GET", `${pc_url}/products?category=${category}`)  // category needs to be URI encoded!
+	return http.get(`${pc_url}/products?category=${category}`, getXRayHttpParams(xray_header))  // category needs to be URI encoded!
 }
 
 function listProductsByID(product_id, xray_header) {
-	return http.request("GET", `${pc_url}/products?id=${product_id}`)
+	return http.get(`${pc_url}/products?id=${product_id}`, getXRayHttpParams(xray_header))
 }
 
 function commitPhoto(pg_id, phone_number, item_id, image, xray_header) {
 	const data = {
 		'photographer': {
-			'id': pg_id,
-			'phone': phone_number
+			'id': pg_id.toString(),
+			'phone': phone_number.toString()
 		},
-		'For': item_id,
+		'For': item_id.toString(),
 		'Media': image  // base64 encoded file
 	}
-	return http.request("POST", `${pr_url}/sms`, JSON.stringify(data), {
+	return http.post(`${pr_url}/sms`, JSON.stringify(data), {
 		headers: {
-			'Content-Type': 'application/json'
+			'Content-Type': 'application/json',
+			'X-Amzn-Trace-Id': xray_header
+		},
+		tags: { // Each request is tagged in the metrics with the corresponding x-ray header
+			'xray_header': xray_header,
 		}
 	})
 }
 
 function randomIntBetween(min, max) { // min and max included
 	return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+// Returns the default k6 http parameters with XRay header and tagging
+function getXRayHttpParams(xray_header) {
+	return {
+		headers: {
+			'X-Amzn-Trace-Id': xray_header
+		},
+		tags: { // Each request is tagged in the metrics with the corresponding x-ray header
+			'xray_header': xray_header,
+		}
+	}
 }
 
 function getXrayTraceHeader() {

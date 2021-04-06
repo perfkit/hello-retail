@@ -1,8 +1,8 @@
 {
-  "name": "assign-photographer",
+  "name": "fail",
   "version": "0.0.1",
-  "description": "A Lambda function for assigning a photographer to take a product image.",
-  "main": "assign.js",
+  "description": "Handle the fail of the process to obtain a photograph from a photographer.",
+  "main": "fail.js",
   "scripts": {
     "test": "echo \"Error: tests executed by root hello-retail package.json\" && exit 1"
   },
@@ -13,7 +13,6 @@
   },
   "homepage": "https://github.com/Nordstrom/hello-retail/product-photos#readme",
   "dependencies": {
-    "bluebird": "^3.5.0",
     "aws-xray-sdk-core": "^3.2.0"
   }
 }

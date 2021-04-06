@@ -14,7 +14,8 @@
     "ajv": "^4.11.3",
     "bluebird": "^3.4.7",
     "got": "^6.7.1",
-    "snyk": "^1.316.1"
+    "snyk": "^1.316.1",
+    "aws-xray-sdk-core": "^3.2.0"
   },
   "snyk": true
 }

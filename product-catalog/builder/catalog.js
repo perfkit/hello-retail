@@ -1,6 +1,7 @@
 'use strict'
 
-const aws = require('aws-sdk') // eslint-disable-line import/no-unresolved, import/no-extraneous-dependencies
+const AWSXRay = require('aws-xray-sdk-core') // eslint-disable-line import/no-unresolved, import/no-extraneous-dependencies
+const aws = AWSXRay.captureAWS(require('aws-sdk')) // eslint-disable-line import/no-unresolved, import/no-extraneous-dependencies
 const KH = require('kinesis-handler')
 
 // TODO Get these from a better place later
