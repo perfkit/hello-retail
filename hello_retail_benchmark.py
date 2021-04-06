@@ -20,9 +20,8 @@ hello_retail:
 # SB calls
 
 def prepare(spec):
-  node_modules_path = Path(__file__).parent / 'node_modules'
-  if not node_modules_path.exists():  # if no dependencies are installed, install dependencies
-    spec.run(f"./install.sh {spec['region']} {spec['stage']} {spec['company']} {spec['team']}", image='serverless_cli')
+  # Better ensure all dependencies are up to date than saving ~30s with conditional installation
+  spec.run(f"./install.sh {spec['region']} {spec['stage']} {spec['company']} {spec['team']}", image='serverless_cli')
 
   log = spec.run(f"./deploy.sh {spec['region']} {spec['stage']} {spec['company']} {spec['team']}", image='serverless_cli')
 
