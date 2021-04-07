@@ -56,11 +56,6 @@ def invoke(spec):
     'IMAGE_FILE': image_target_file
   }
   spec.run_k6(envs)
-  # out_options = f"--out csv={spec.workload_log_file()}"
-  # spec.run(f'''k6 run {out_options} -e \"EVENT_WRITER_URL={spec['endpoint_event_writer_api']}\" \\
-  #   -e \"PRODUCT_CATALOG_URL={spec['endpoint_product_catalog_api']}\" \\
-  #   -e \"PHOTO_RECEIVE_URL={spec['endpoint_photo_receive_api']}\" \\
-  #   -e \"IMAGE_FILE={image_target_file}\" workload_script.js''', image = 'loadimpact/k6:0.30.0')
 
 
 def cleanup(spec):
