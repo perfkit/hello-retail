@@ -20,7 +20,7 @@ const actions = [
 		run: (state, xray_header) => {
 			const photo_id = state.current_photo_id++
 			
-			const res = registerPhotographer(`photographer-${photo_id}`, photo_id, xray_header);
+			const res = registerPhotographer(`photographer-${__VU}-${photo_id}`, photo_id, xray_header);
 			// console.log(JSON.stringify(res))
 			check(res, {
 				'status is 200': (res) => res.status === 200,
@@ -41,7 +41,7 @@ const actions = [
 			}
 			const cat = `category-${cat_id}`
 			
-			const res = newProduct(id, cat, `name${id}`, `brand-${id}`, `description-${id}`, xray_header);
+			const res = newProduct(`${__VU}-${id}`, cat, `name${id}`, `brand-${id}`, `description-${id}`, xray_header);
 			// console.log(JSON.stringify(res))
 			check(res, {
 				'status is 200': (res) => res.status === 200,
@@ -87,7 +87,7 @@ const actions = [
 			if (state.current_product_id < min_product_id) return
 			const id = randomIntBetween(min_product_id, state.current_product_id)
 			
-			const res = listProductsByID(id, xray_header)
+			const res = listProductsByID(`${__VU}-${id}`, xray_header)
 			// console.log(JSON.stringify(res))
 			check(res, {
 				'status is 200': (res) => res.status === 200,
@@ -106,7 +106,7 @@ const actions = [
 			const id = randomIntBetween(min_product_id, state.current_product_id)
 			const photo_id = randomIntBetween(min_photo_id, state.current_photo_id)
 			
-			const res = commitPhoto(`photographer-${photo_id}`, photo_id, id, image_data, xray_header)
+			const res = commitPhoto(`photographer-${__VU}-${photo_id}`, photo_id, `${__VU}-${id}`, image_data, xray_header)
 			// console.log(JSON.stringify(res))
 			check(res, {
 				'status is 200': (res) => res.status === 200,
@@ -139,7 +139,7 @@ export default function() {
 		return false;
 	}) || actions[randomIndex];
 	// const action = actions[1]
-	console.log(`[vu ${__VU}] Action: ${action.name}`)
+	// console.log(`[vu ${__VU}] Action: ${action.name}`)
 
 	const xray_header = getXrayTraceHeader()
 
