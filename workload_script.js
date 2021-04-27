@@ -139,7 +139,7 @@ export default function() {
 		return false;
 	}) || actions[randomIndex];
 	// const action = actions[1]
-	console.log(`[vu ${__VU}] Action: ${action.name}`)
+	// console.log(`[vu ${__VU}] Action: ${action.name}`)
 
 	const xray_header = getXrayTraceHeader()
 
