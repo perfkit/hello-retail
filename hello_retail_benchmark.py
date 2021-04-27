@@ -1,6 +1,6 @@
 import base64
 import logging
-from pathlib import Path
+import random
 import re
 
 BENCHMARK_CONFIG = """
@@ -20,10 +20,14 @@ hello_retail:
 # SB calls
 
 def prepare(spec):
-  # Better ensure all dependencies are up to date than saving ~30s with conditional installation
-  spec.run(f"./install.sh {spec['region']} {spec['stage']} {spec['company']} {spec['team']}", image='serverless_cli')
+  # The deploy_id is used to generate globally unique S3 bucket names
+  spec['deploy_id'] = spec['deploy_id'] or random.randint(1000, 9999)
+  spec['domain_name'] = f"hello-retail-{spec['deploy_id']}"
 
-  log = spec.run(f"./deploy.sh {spec['region']} {spec['stage']} {spec['company']} {spec['team']}", image='serverless_cli')
+  # Better ensure all dependencies are up to date than saving ~30s with conditional installation
+  spec.run(f"./install.sh {spec['region']} {spec['stage']} {spec['company']} {spec['team']} {spec['domain_name']}", image='serverless_cli')
+
+  log = spec.run(f"./deploy.sh {spec['region']} {spec['stage']} {spec['company']} {spec['team']} {spec['domain_name']}", image='serverless_cli')
 
   urls = re.findall(r" [-] https://[-\w.]+execute-api[-\w.]+/\w+/[\w-]+", log)
   for url in urls:
@@ -59,7 +63,7 @@ def invoke(spec):
 
 
 def cleanup(spec):
-  spec.run(f"./remove.sh {spec['region']} {spec['stage']} {spec['company']} {spec['team']}", image='serverless_cli')
+  spec.run(f"./remove.sh {spec['region']} {spec['stage']} {spec['company']} {spec['team']} {spec['domain_name']}", image='serverless_cli')
 
 
 # Util

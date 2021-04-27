@@ -36,6 +36,7 @@ custom:
       - ${self:custom.stage}.${self:custom.domainName}
 
   # FQDN for direct access to S3 bucket website.
+  # Example: http://dev.hello-retail-1234.s3.amazonaws.com/index.html#/
   originDomainName:
     Fn::Join: # e.g. hello-retail.biz.s3.amazonaws.com
       - ''

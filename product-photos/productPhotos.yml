@@ -1,5 +1,5 @@
 #TODO REMOVE AND REPLACE
-bucket: hello-retail.biz
+bucket: ${self:custom.private.domainName}
 bucketArn: arn:aws:s3:::${self:custom.productPhotos.bucket}
 
 # Project

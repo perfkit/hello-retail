@@ -3,4 +3,7 @@ company: ${env:COMPANY}
 team: ${env:TEAM}
 stage: ${env:STAGE}
 
-domainName: hello-retail.biz
+# make domainName configurable via environment variable
+# to fix potential name collision on S3 buckets
+# used for deployment bucket and in the productPhotos service
+domainName: ${env:DOMAIN_NAME, hello-retail.biz}
