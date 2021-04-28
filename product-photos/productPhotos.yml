@@ -1,4 +1,5 @@
 #TODO REMOVE AND REPLACE
+# NOTE: This bucket is created in the web frontend service!
 bucket: ${self:custom.private.domainName}
 bucketArn: arn:aws:s3:::${self:custom.productPhotos.bucket}
 
