@@ -41,7 +41,7 @@ const actions = [
 			}
 			const cat = `category-${cat_id}`
 			
-			const res = newProduct(`${__VU}-${id}`, cat, `name${id}`, `brand-${id}`, `description-${id}`, xray_header);
+			const res = newProduct(`${__VU}000${id}`, cat, `name${id}`, `brand-${id}`, `description-${id}`, xray_header);
 			// console.log(JSON.stringify(res))
 			check(res, {
 				'status is 200': (res) => res.status === 200,
@@ -87,7 +87,7 @@ const actions = [
 			if (state.current_product_id < min_product_id) return
 			const id = randomIntBetween(min_product_id, state.current_product_id)
 			
-			const res = listProductsByID(`${__VU}-${id}`, xray_header)
+			const res = listProductsByID(`${__VU}000${id}`, xray_header)
 			// console.log(JSON.stringify(res))
 			check(res, {
 				'status is 200': (res) => res.status === 200,
@@ -106,7 +106,7 @@ const actions = [
 			const id = randomIntBetween(min_product_id, state.current_product_id)
 			const photo_id = randomIntBetween(min_photo_id, state.current_photo_id)
 			
-			const res = commitPhoto(`photographer-${__VU}-${photo_id}`, photo_id, `${__VU}-${id}`, image_data, xray_header)
+			const res = commitPhoto(`photographer-${__VU}-${photo_id}`, photo_id, `${__VU}000${id}`, image_data, xray_header)
 			// console.log(JSON.stringify(res))
 			check(res, {
 				'status is 200': (res) => res.status === 200,
@@ -169,6 +169,8 @@ function registerPhotographer(pg_id, phone_number, xray_header) {
 function newProduct(prod_id, prod_category, prod_name, prod_brand, prod_desc, xray_header) {
 	const data = {
 		'schema': 'com.nordstrom/product/create/1-0-0',
+		// String in JSON but needs to be numeric:
+		// https://github.com/perfkit/hello-retail/blob/master/product-catalog/api/product-items-schema.json#L13
 		'id': prod_id.toString(),
 		'origin': 'hello-retail/sb-create-product/dummy_id/dummy_name',
 		'category': prod_category.trim(),
