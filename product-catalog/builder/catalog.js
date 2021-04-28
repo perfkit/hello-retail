@@ -31,6 +31,7 @@ const impl = {
    *   "schema": "com.nordstrom/retail-stream/1-0-0",
    *   "origin": "hello-retail/product-producer-automation",
    *   "timeOrigin": "2017-01-12T18:29:25.171Z",
+   *   "traceId": "1-6089c2ee-ee6f2517d06abc24fde41c4a",
    *   "data": {
    *     "schema": "com.nordstrom/product/create/1-0-0",
    *     "id": "4579874",
@@ -44,6 +45,10 @@ const impl = {
    * @param complete The callback to inform of completion, with optional error parameter.
    */
   putProduct: (event, complete) => {
+    // Submit XRay trace ID from previous trace due to lacking Kinesis support
+    AWSXRay.captureFunc('annotations', function(subsegment) {
+      subsegment.addAnnotation('root_trace_id', String(event.traceId));
+    });
     const updated = Date.now()
     let priorErr
     const updateCallback = (err) => {
@@ -138,6 +143,7 @@ const impl = {
    *   "schema": "com.nordstrom/retail-stream/1-0-0",
    *   "origin": "hello-retail/product-producer-automation",
    *   "timeOrigin": "2017-01-12T18:29:25.171Z",
+   *   "traceId": "1-6089c2ee-ee6f2517d06abc24fde41c4a",
    *   "data": {
    *     "schema": "com.nordstrom/product/image/1-0-0",
    *     "id": "4579874",
@@ -148,6 +154,10 @@ const impl = {
    * @param complete The callback to inform of completion, with optional error parameter.
    */
   putImage: (event, complete) => {
+    // Submit XRay trace ID from previous trace due to lacking Kinesis support
+    AWSXRay.captureFunc('annotations', function(subsegment) {
+      subsegment.addAnnotation('root_trace_id', String(event.traceId));
+    });
     const updated = Date.now()
     const dbParamsProduct = {
       TableName: constants.TABLE_PRODUCT_CATALOG_NAME,
@@ -191,5 +201,5 @@ module.exports = {
   processKinesisEvent: kh.processKinesisEvent.bind(kh),
 }
 
-console.log(`${constants.MODULE} - CONST: ${JSON.stringify(constants, null, 2)}`)
-console.log(`${constants.MODULE} - ENV:   ${JSON.stringify(process.env, null, 2)}`)
+// console.log(`${constants.MODULE} - CONST: ${JSON.stringify(constants, null, 2)}`)
+// console.log(`${constants.MODULE} - ENV:   ${JSON.stringify(process.env, null, 2)}`)

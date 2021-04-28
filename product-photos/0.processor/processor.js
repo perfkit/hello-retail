@@ -28,8 +28,9 @@ const constants = {
  */
 const transformer = (payload, record) => {
   const result = Object.assign({}, payload)
-  result.schema = 'com.nordstrom/retail-stream-egress/1-0-0'
+  result.schema = 'com.nordstrom/retail-stream-egress/1-1-0'
   result.eventId = record.eventID
+  result.traceId = record.traceId
   result.timeIngest = new Date(record.kinesis.approximateArrivalTimestamp * 1000).toISOString()
   result.timeProcess = new Date().toISOString()
   return result
@@ -79,6 +80,7 @@ const impl = {
    *   "schema": "com.nordstrom/retail-stream/1-0-0",
    *   "origin": "hello-retail/photographer-registration-automation",
    *   "timeOrigin": "2017-01-12T18:29:25.171Z",
+   *   "traceId": "1-6089c2ee-ee6f2517d06abc24fde41c4a",
    *   "data": {
    *     "schema": "com.nordstrom/user-info/update-phone/1-0-0",
    *     "id": "4579874",
@@ -88,6 +90,10 @@ const impl = {
    * @param complete The callback with which to report any errors
    */
   registerPhotographer: (event, complete) => {
+    // Submit XRay trace ID from previous trace due to lacking Kinesis support
+    AWSXRay.captureFunc('annotations', function(subsegment) {
+      subsegment.addAnnotation('root_trace_id', String(event.traceId));
+    });
     const updated = Date.now()
     const putParams = {
       TableName: constants.TABLE_PHOTO_REGISTRATIONS_NAME,
@@ -153,6 +159,7 @@ const impl = {
    *   "schema": "com.nordstrom/retail-stream/1-0-0",
    *   "origin": "hello-retail/product-producer-automation",
    *   "timeOrigin": "2017-01-12T18:29:25.171Z",
+   *   "traceId": "1-6089c2ee-ee6f2517d06abc24fde41c4a",
    *   "data": {
    *     "schema": "com.nordstrom/product/create/1-0-0",
    *     "id": "4579874",
@@ -165,6 +172,10 @@ const impl = {
    * @param complete The callback with which to report any errors
    */
   startExecution: (event, complete) => {
+    // Submit XRay trace ID from previous trace due to lacking Kinesis support
+    AWSXRay.captureFunc('annotations', function(subsegment) {
+      subsegment.addAnnotation('root_trace_id', String(event.traceId));
+    });
     const sfEvent = event
     sfEvent.merchantName = impl.eventSource(event.origin).friendlyName
     const params = {
@@ -194,5 +205,5 @@ module.exports = {
   processKinesisEvent: kh.processKinesisEvent.bind(kh),
 }
 
-console.log(`${constants.MODULE} - CONST: ${JSON.stringify(constants, null, 2)}`)
-console.log(`${constants.MODULE} - ENV:   ${JSON.stringify(process.env, null, 2)}`)
+// console.log(`${constants.MODULE} - CONST: ${JSON.stringify(constants, null, 2)}`)
+// console.log(`${constants.MODULE} - ENV:   ${JSON.stringify(process.env, null, 2)}`)

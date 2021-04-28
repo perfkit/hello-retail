@@ -60,12 +60,23 @@ const impl = {
 
   success: response => impl.response(200, JSON.stringify(response)),
 
+  // XRay trace id to pass into kinesis for next function.
+  // Using env variable convention from XRay SDK:
+  // https://github.com/aws/aws-xray-sdk-node/blob/master/packages/core/lib/env/aws_lambda.js#L79
+  // Example: process.env._X_AMZN_TRACE_ID == "Root=1-6089c2ee-ee6f2517d06abc24fde41c4a;Parent=bf496f08ba12224b;Sampled=1"
+  getRootTraceId: (event) => {
+    // Alternatively read traceData from event headers
+    const traceData = event.headers['X-Amzn-Trace-Id'] || process.env._X_AMZN_TRACE_ID;
+    const data = AWSXRay.utils.processTraceData(traceData);
+    return data.root;
+  },
+
   validateAndWriteKinesisEventFromApiEndpoint(event, callback) {
-    console.log(JSON.stringify(event))
+    // console.log(JSON.stringify(event))
     const eventData = JSON.parse(event.body)
-    console.log(eventData)
+    // console.log(eventData)
     const origin = eventData.origin
-    console.log(origin)
+    // console.log(origin)
     delete eventData.origin
 
     if (!eventData.schema || typeof eventData.schema !== 'string') {
@@ -80,8 +91,9 @@ const impl = {
         const kinesis = new aws.Kinesis()
         const newEvent = {
           Data: JSON.stringify({
-            schema: 'com.nordstrom/retail-stream-ingress/1-0-0',
+            schema: 'com.nordstrom/retail-stream-ingress/1-1-0',
             timeOrigin: new Date().toISOString(),
+            traceId: impl.getRootTraceId(event),
             data: eventData,
             origin, // TODO mask any PII here
           }),
