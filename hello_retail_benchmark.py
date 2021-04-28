@@ -63,6 +63,8 @@ def invoke(spec):
 
 
 def cleanup(spec):
+  # Empty web bucket used by backend photos service (2.receive) to store images for the frontend
+  spec.run(f"aws s3 rm s3://{spec['domain_name']} --recursive", image='aws_cli')
   spec.run(f"./remove.sh {spec['region']} {spec['stage']} {spec['company']} {spec['team']} {spec['domain_name']}", image='serverless_cli')
 
 
