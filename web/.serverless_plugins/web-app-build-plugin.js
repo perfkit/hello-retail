@@ -104,6 +104,10 @@ class ServerlessPlugin {
   }
 
   getBucketName() {
+    // NOTE: disable conditional stage bucket prefix because
+    // the backend service productPhotos.yml does not implement this!
+    // Just using the domainName for now. Also see the web serverless.yml
+    return this.serverless.service.custom.domainName;
     const stage = this.serverless.variables.service.custom.stage
     const s3Bucket = stage === 'prod' ?
       this.serverless.service.custom.domainName :
