@@ -46,6 +46,17 @@ const kinesis = new aws.Kinesis()
  * Implementation
  */
 const impl = {
+  // XRay trace id to pass into kinesis for next function.
+  // Using env variable convention from XRay SDK:
+  // https://github.com/aws/aws-xray-sdk-node/blob/master/packages/core/lib/env/aws_lambda.js#L79
+  // Example: process.env._X_AMZN_TRACE_ID == "Root=1-6089c2ee-ee6f2517d06abc24fde41c4a;Parent=bf496f08ba12224b;Sampled=1"
+  getRootTraceId: (event) => {
+    // Alternatively read traceData from event headers
+    const traceData = event.headers['X-Amzn-Trace-Id'] || process.env._X_AMZN_TRACE_ID;
+    const data = AWSXRay.utils.processTraceData(traceData);
+    return data.root;
+  },
+
   writeToStream: (lambdaEvent, callback) => {
     const origin = `product-photos/Photographer/${lambdaEvent.photographer.phone}/${lambdaEvent.photographer.id}`
     const productId = lambdaEvent.data.id.toString()
@@ -53,6 +64,7 @@ const impl = {
       schema: eventSchemaId,
       origin,
       timeOrigin: new Date().toISOString(),
+      traceId: impl.getRootTraceId(lambdaEvent),
       data: {
         schema: productImageSchemaId,
         id: productId,
