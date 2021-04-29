@@ -52,11 +52,26 @@ resources:
                       - 'Fn::ImportValue': ${self:custom.productPhotos.exportPhotoAssignmentsFailLambdaArn}
                       - 'Fn::ImportValue': ${self:custom.productPhotos.exportPhotoAssignmentsSuccessLambdaArn}
                       - 'Fn::ImportValue': ${self:custom.productPhotos.exportPhotoAssignmentsReportLambdaArn}
-    # Step Function
+                  # Step Function role needs permissions to submit XRay traces
+                  -
+                    Sid: "XRayTracing"
+                    Effect: "Allow"
+                    Action:
+                      - "xray:PutTraceSegments"
+                      - "xray:PutTelemetryRecords"
+                      - "xray:GetSamplingRules"
+                      - "xray:GetSamplingTargets"
+                      - "xray:GetSamplingStatisticSummaries"
+                    Resource: "*"
+    # Step Function: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-stepfunctions-statemachine.html
     StepFunction:
       Type: 'AWS::StepFunctions::StateMachine'
       Properties:
         DefinitionString: '${file(acquirePhoto.js):shim}'
+        TracingConfiguration:
+          Enabled: true
+        # Express state machine does not support activity ARN
+        # StateMachineType: EXPRESS
         RoleArn:
           'Fn::GetAtt': [ StepFunctionRole, Arn ]
   Outputs:

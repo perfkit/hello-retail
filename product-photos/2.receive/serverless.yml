@@ -12,6 +12,9 @@ provider:
   name: aws
   runtime: nodejs12.x
   region: ${self:custom.private.region}
+  tracing:
+    apiGateway: true
+    lambda: true
 
 functions:
   receive:
@@ -60,6 +63,8 @@ resources:
         ManagedPolicyArns:
           - arn:aws:iam::aws:policy/AWSLambda_FullAccess
           - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+          # Lambda execution role permissions for XRay: https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html#services-xray-permissions
+          - arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
         Policies:
           - PolicyName: CreateAndWriteToLogStream
             PolicyDocument:

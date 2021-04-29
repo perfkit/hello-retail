@@ -1,7 +1,8 @@
 'use strict'
 
 const Promise = require('bluebird')
-const aws = require('aws-sdk')
+const AWSXRay = require('aws-xray-sdk-core') // eslint-disable-line import/no-unresolved, import/no-extraneous-dependencies
+const aws = AWSXRay.captureAWS(require('aws-sdk')) // eslint-disable-line import/no-unresolved, import/no-extraneous-dependencies
 
 const dynamo = new aws.DynamoDB.DocumentClient()
 const stepfunctions = new aws.StepFunctions()
@@ -91,6 +92,7 @@ const impl = {
 //   schema: 'com.nordstrom/retail-stream/1-0-0',
 //   origin: 'hello-retail/product-producer-automation',
 //   timeOrigin: '2017-01-12T18:29:25.171Z',
+//   traceId: '1-6089c2ee-ee6f2517d06abc24fde41c4a',
 //   data: {
 //     schema: 'com.nordstrom/product/create/1-0-0',
 //     id: 4579874,
@@ -101,7 +103,7 @@ const impl = {
 //   }
 // }
 exports.handler = (event, context, callback) => {
-  console.log(JSON.stringify(event))
+  // console.log(JSON.stringify(event))
   impl.getTask(event, (getErr, task) => {
     if (getErr) {
       callback(getErr)

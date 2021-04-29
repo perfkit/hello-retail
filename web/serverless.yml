@@ -29,13 +29,16 @@ custom:
   domainName: ${self:custom.private.domainName}
 
   # Fully Qualified Domain Name for the hosted website.
-  dnsHostName:
-    Fn::If: # e.g. hello-retail.biz or stage.hello-retail.biz
-      - ProductionStage
-      - ${self:custom.domainName}
-      - ${self:custom.stage}.${self:custom.domainName}
+  # Just using the domain name for now
+  dnsHostName: ${self:custom.domainName}
+    # TODO: need to adjust the dependent bucket name in the productPhotos.yml service accordingly if going for such a dynamic approach
+    # Fn::If: # e.g. hello-retail.biz or stage.hello-retail.biz
+    #   - ProductionStage
+    #   - ${self:custom.domainName}
+    #   - ${self:custom.stage}.${self:custom.domainName}
 
   # FQDN for direct access to S3 bucket website.
+  # Example: http://dev.hello-retail-1234.s3.amazonaws.com/index.html#/
   originDomainName:
     Fn::Join: # e.g. hello-retail.biz.s3.amazonaws.com
       - ''
