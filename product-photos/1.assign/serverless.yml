@@ -10,6 +10,7 @@ custom:
 
 provider:
   name: aws
+  lambdaHashingVersion: 20201221
   runtime: nodejs12.x
   region: ${self:custom.private.region}
   timeout: 65
