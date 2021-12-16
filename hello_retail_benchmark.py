@@ -22,12 +22,11 @@ hello_retail:
 def prepare(spec):
   # The deploy_id is used to generate globally unique S3 bucket names
   spec['deploy_id'] = spec['deploy_id'] or random.randint(1000, 9999)
-  spec['domain_name'] = f"hello-retail-{spec['deploy_id']}"
 
   # Better ensure all dependencies are up to date than saving ~30s with conditional installation
-  spec.run(f"./install.sh {spec['region']} {spec['stage']} {spec['company']} {spec['team']} {spec['domain_name']}", image='serverless_cli')
+  spec.run(f"./install.sh {spec['region']} {spec['stage']} {spec['company']} {spec['team']} {domain_name(spec)}", image='serverless_cli')
 
-  log = spec.run(f"./deploy.sh {spec['region']} {spec['stage']} {spec['company']} {spec['team']} {spec['domain_name']}", image='serverless_cli')
+  log = spec.run(f"./deploy.sh {spec['region']} {spec['stage']} {spec['company']} {spec['team']} {domain_name(spec)}", image='serverless_cli')
 
   urls = re.findall(r" [-] https://[-\w.]+execute-api[-\w.]+/\w+/[\w-]+", log)
   for url in urls:
@@ -64,8 +63,8 @@ def invoke(spec):
 
 def cleanup(spec):
   # Empty web bucket used by backend photos service (2.receive) to store images for the frontend
-  spec.run(f"aws s3 rm s3://{spec['domain_name']} --recursive", image='aws_cli')
-  spec.run(f"./remove.sh {spec['region']} {spec['stage']} {spec['company']} {spec['team']} {spec['domain_name']}", image='serverless_cli')
+  spec.run(f"aws s3 rm s3://{domain_name(spec)} --recursive", image='aws_cli')
+  spec.run(f"./remove.sh {spec['region']} {spec['stage']} {spec['company']} {spec['team']} {domain_name(spec)}", image='serverless_cli')
 
 
 # Util
@@ -75,3 +74,7 @@ def encodeImage(source_filename, target_filename):
     image_64_encode = base64.b64encode(image.read())
     with open(target_filename, "wb") as target_image_file:
       target_image_file.write(image_64_encode)
+
+
+def domain_name(spec):
+  return f"hello-retail-{spec['deploy_id']}"
